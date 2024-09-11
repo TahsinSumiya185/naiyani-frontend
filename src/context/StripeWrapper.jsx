@@ -27,12 +27,12 @@ const StripeWrapper = ({ children }) => {
           throw new Error('Failed to fetch subscription config');
         }
 
-        const data = await response.json();
-        if (!data.publishableKey) {
+        const { publishableKey } = await response.json();
+        if (!publishableKey) {
           throw new Error('Missing publishableKey in config response');
         }
 
-        setStripePromise(loadStripe(data.publishableKey));
+        setStripePromise(loadStripe(publishableKey));
       } catch (err) {
         setError(err.message);
       }
@@ -42,11 +42,11 @@ const StripeWrapper = ({ children }) => {
   }, []);
 
   if (error) {
-    return <div>Error: {error}</div>; // Show an error if fetch fails
+    return <div>Error: {error}</div>;
   }
 
   if (!stripePromise) {
-    return <div>Loading Stripe...</div>; // Show loading indicator
+    return <div>Loading Stripe...</div>;
   }
 
   return <Elements stripe={stripePromise}>{children}</Elements>;
