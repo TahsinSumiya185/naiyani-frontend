@@ -6,5 +6,5 @@ export const baseApi = createApi({
     baseUrl: "http://127.0.0.1:8000/api/v1/",
   }),
   endpoints: () => ({}),
-  tagTypes: ["user"],
+  tagTypes: ["user", "Config", "Subscription"],
 });

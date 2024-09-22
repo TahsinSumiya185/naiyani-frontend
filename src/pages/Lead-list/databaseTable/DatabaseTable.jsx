@@ -1,20 +1,21 @@
 import { useEffect, useState } from "react";
-import TopBar from "../../components/topBar/TopBar";
+
 import "./DatabaseTable.css";
-import { Link, useNavigate } from "react-router-dom";
-import { SideBySideMagnifier } from "react-image-magnifiers";
-import { LinkOutlined, CaretDownOutlined, CaretUpOutlined } from "@ant-design/icons";
-import { Dropdown, Menu, Input } from "antd";
-import { IoMdRefreshCircle } from "react-icons/io";
-import Paginations from "../../components/pagination/Paginations";
-import Loading from "../../components/loading/Loading";
-import Zoom from 'react-medium-image-zoom';
+import { useNavigate } from "react-router-dom";
+
+import { CaretDownOutlined, CaretUpOutlined } from "@ant-design/icons";
+import { Dropdown, Menu } from "antd";
+
 import 'react-medium-image-zoom/dist/styles.css';
 import { useLocation } from "react-router-dom";
 import ItemsDetails from "./ItemsDetails";
-import { useFetchLeadsQuery, useRefreshDataMutation } from "../../redux/api/leadsApi/leadsApi";
+import { useFetchLeadsQuery, useRefreshDataMutation,useRefreshAsinQuery, useCheckAsinsMutation  } from "../../../redux/api/leadsApi/leadsApi";
+import TopBar from "../../../components/topBar/TopBar";
+import Loading from "../../../components/loading/Loading";
+import Paginations from "../../../components/pagination/Paginations";
 
-const { Search } = Input;
+
+
 
 const DatabaseTable = () => {
   const [sortingType, setSortingType] = useState('asc');
@@ -84,13 +85,15 @@ const DatabaseTable = () => {
   };
   
 
-  useEffect(() => {
-    localStorage.setItem('currentPage', currentPage);
-  }, [currentPage]);
+  // useEffect(() => {
+  //   localStorage.setItem('currentPage', currentPage);
+  // }, [currentPage]);
 
   useEffect(() => {
+    localStorage.setItem('currentPage', currentPage);
     refetch().finally(() => setIsPageLoading(false));
   }, [currentPage, limit, columnName, sortingType]);
+
 
 
   return (
@@ -144,22 +147,25 @@ const DatabaseTable = () => {
             <Loading size="large" />
           </div>
         ) : (
+          <>
           <div className="grid gap-8">
             {data?.results?.data?.map((item) => (
               <ItemsDetails key={item.asin} item={item} onClick={() => handleRefresh()} setSelectedAsin={setSelectedAsin} />
             ))}
           </div>
+           <div className="flex justify-center mt-4">
+           <Paginations
+             currentPage={currentPage}
+             limit={limit}
+             totalItems={data?.count || 0}
+             handlePageChange={handlePageChange}
+             handleLimitChange={handleLimitChange}
+           />
+         </div>
+         </>
         )}
 
-        <div className="flex justify-center mt-4">
-          <Paginations
-            currentPage={currentPage}
-            limit={limit}
-            totalItems={data?.count || 0}
-            handlePageChange={handlePageChange}
-            handleLimitChange={handleLimitChange}
-          />
-        </div>
+       
       </div>
     </div>
   );

@@ -1,8 +1,12 @@
 import { GiCheckMark } from "react-icons/gi";
 import { FaArrowAltCircleRight } from "react-icons/fa";
 import StripeWrapper from "../../../context/StripeWrapper";
+import Loading from "../../../components/loading/Loading";
 
-const PricingCards = ({ prices, showMonthly, showYearly, createSubscription }) => {
+const PricingCards = ({ prices, showMonthly, showYearly, createSubscription, isLoading  }) => {
+  if (isLoading) {
+    return <Loading />;
+  }
   return (
     <>
   

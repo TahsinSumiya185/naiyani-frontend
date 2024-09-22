@@ -1,55 +1,48 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
-import { Provider } from "react-redux";
+import { Provider, useDispatch } from "react-redux";
 import store from "./redux/store";
 import { RouterProvider } from "react-router-dom";
 import routes from "./routes/index";
-import StripeWrapper from "./context/StripeWrapper";
+import { Elements } from "@stripe/react-stripe-js";
+ // Use existing paymentApi for Stripe config
+ // To store Stripe instance
+import { useSelector } from "react-redux";
+import { useGetConfigQuery } from "./redux/api/payment/paymentApi";
+import { loadStripe } from "@stripe/stripe-js";
+import Loading from "./components/loading/Loading";
 
-const AppWithStripe = () => {
-  const [isReady, setIsReady] = useState(false);
+// Main logic for rendering the app
+const RootComponent = () => {
+  const [stripePromise, setStripePromise] = useState(null);
+  const { data, error } = useGetConfigQuery(); // Fetch config (including publishableKey)
 
   useEffect(() => {
-    const checkStripeReady = async () => {
-      const token = localStorage.getItem('accessToken');
-      if (token) {
-        try {
-          const response = await fetch('http://localhost:8000/api/v1/payment/config/', {
-            method: 'GET',
-            headers: {
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            },
-          });
+    if (data && data.publishableKey) {
+      const stripe = loadStripe(data.publishableKey); // Initialize Stripe instance
+      setStripePromise(stripe); // Store in component state
+    }
+  }, [data]);
 
-          if (response.ok) {
-            setIsReady(true);
-          }
-        } catch {
-          // Handle errors as needed
-        }
-      }
-    };
+  if (error) {
+    return <Loading />;
+  }
 
-    checkStripeReady();
-  }, []);
-
-  return isReady ? (
-    <StripeWrapper>
+  return stripePromise ? (
+    <Elements stripe={stripePromise}>
       <RouterProvider router={routes} />
-    </StripeWrapper>
+    </Elements>
   ) : (
-    <RouterProvider router={routes} />
+    <Loading />
   );
 };
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
-
 root.render(
   <React.StrictMode>
     <Provider store={store}>
-      <AppWithStripe />
+      <RootComponent />
     </Provider>
   </React.StrictMode>
 );

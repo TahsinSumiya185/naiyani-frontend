@@ -1,17 +1,18 @@
-
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { baseApi } from '../apiSlice';
 
 export const leadsApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
+    //  API for fetching leads
     fetchLeads: builder.query({
-        query: ({ categoryId, columnName, sortingType, limit, offset }) => ({
-          url: `leads/leads-data/?category_id=${categoryId}&column_name=${columnName}&sorting_type=${sortingType}&limit=${limit}&offset=${offset}`,
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
-        }),
+      query: ({ categoryId, columnName, sortingType, limit, offset }) => ({
+        url: `leads/leads-data/?category_id=${categoryId}&column_name=${columnName}&sorting_type=${sortingType}&limit=${limit}&offset=${offset}`,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
       }),
+    }),
+
+    //  API for refreshing data
     refreshData: builder.mutation({
       query: ({ asin, categoryId }) => ({
         url: 'spapi/get_sp_api_bulk_data',
@@ -25,7 +26,35 @@ export const leadsApi = baseApi.injectEndpoints({
         },
       }),
     }),
+
+    // API for refreshing ASIN
+    refreshAsin: builder.query({
+      query: (asin) => ({
+        url: `spapi/refresh/${asin}/`,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      }),
+    }),
+
+    // API for checking a list of ASINs
+    checkAsins: builder.mutation({
+      query: (asins) => ({
+        url: 'spapi/check-asins/',
+        method: 'POST',
+        body: { asins },
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      }),
+    }),
   }),
 });
 
-export const { useFetchLeadsQuery, useRefreshDataMutation } = leadsApi;
+// Export hooks for use in components
+export const {
+  useFetchLeadsQuery,
+  useRefreshDataMutation,
+  useRefreshAsinQuery,
+  useCheckAsinsMutation,
+} = leadsApi;

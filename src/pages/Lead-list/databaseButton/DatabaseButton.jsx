@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import "./DatabaseButton.css";
-import TopBar from "../../components/topBar/TopBar";
-import CustomButton from "../../components/customButton/CustomButton";
+import TopBar from "../../../components/topBar/TopBar";
+import CustomButton from "../../../components/customButton/CustomButton";
 
 const DatabaseButton = () => {
   const navigate = useNavigate();

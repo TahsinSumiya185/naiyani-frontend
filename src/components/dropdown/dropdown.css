@@ -1,0 +1,52 @@
+.custom-select {
+  position: relative; /* Ensures dropdown is positioned correctly */
+  width: 100%;
+  max-width: 300px;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  z-index: 1000; /* Ensure dropdown is on top */
+}
+
+.custom-select-selected {
+  padding: 0.75rem 1.25rem;
+  font-size: 16px;
+  color: #4a4a4a;
+  background-color: #ffffff;
+  z-index: 1001; /* Higher than options */
+}
+
+.custom-select-options {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-top: none;
+  border-radius: 0 0 0.5rem 0.5rem;
+  background-color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 2000; /* Ensure options are on top */
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 200px; /* Optional: handle long lists */
+  overflow-y: auto; /* Optional: adds scroll if options exceed max height */
+}
+
+.custom-select-option {
+  padding: 0.75rem 1.25rem;
+  font-size: 16px;
+  color: #4a4a4a;
+  cursor: pointer;
+  z-index: 2001; /* Higher than options */
+}
+
+.custom-select-option:hover {
+  background-color: #f1f5f9;
+}
+
+.custom-select-option.selected {
+  background-color: #e2e8f0;
+}

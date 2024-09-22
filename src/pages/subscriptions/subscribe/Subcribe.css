@@ -1,0 +1,59 @@
+.expanding-input2 {
+  padding: 10px;
+  font-size: 136px;
+}
+
+.placeholder-center::placeholder {
+  text-align: center;
+}
+.text-fonts {
+ font-size: 35px;
+  font-family: "Rastanty Cortez";
+
+
+
+}
+
+select {
+  -webkit-appearance: none; /* For Safari */
+  -moz-appearance: none;    /* For Firefox */
+  appearance: none;         /* Standard */
+}
+
+
+
+/* Hide the default Ant Design dropdown arrow */
+/* Hide the default Ant Design dropdown arrow */
+.ant-dropdown-trigger .anticon {
+  display: none;
+}
+
+/* Style the dropdown menu */
+.ant-dropdown-menu {
+  box-shadow: 4px 4px 4px rgba(26, 25, 25, 0.25) !important;
+  border-radius: 20px;
+}
+
+/* Style the menu items */
+.ant-dropdown-menu-item {
+  font-size: 16px !important; /* Adjust size as needed */
+  color: #706f6f !important; /* Default text color */
+}
+
+/* Style the menu items on hover */
+.ant-dropdown-menu-item:hover {
+  background-color: #f0f0f0 !important; /* Light grey background on hover */
+  color: #000 !important; /* Text color on hover */
+}
+
+/* Style the selected menu item */
+.ant-dropdown-menu-item-active {
+  background-color: #e0e0e0; /* Light grey background when selected */
+  color: #fff; /* White text color when selected */
+}
+
+/* Style the link to remove arrow */
+.dropdown-link {
+  font-size: 16px; /* Match size with menu items */
+  color: #9e9e9e !important; /* This matches the text-gray-400 color */
+}

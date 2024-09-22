@@ -1,15 +1,13 @@
 import { createBrowserRouter } from "react-router-dom";
 import App from "../App";
-import DatabaseButton from "../pages/databaseButton/DatabaseButton";
-import DatabaseList from "../pages/databaseList/DatabaseList";
-import DatabaseTable from "../pages/databaseTable/DatabaseTable";
+import DatabaseList from "../pages/Lead-list/databaseList/DatabaseList";
+import DatabaseButton from "../pages/Lead-list/databaseButton/DatabaseButton";
+import DatabaseTable from "../pages/Lead-list/databaseTable/DatabaseTable";
 import Help from "../pages/help/Help";
 import SignUp from "../pages/auth/signUp/SignUp";
 import Terms from "../pages/terms/Terms";
 import Privacy from "../pages/privacy/Privacy";
 import Verify from "../pages/auth/verify/Verify";
-// import PrivateRoute from "./PrivateRoute";
-
 import Login from "../pages/auth/loginPage/Login";
 import LandingPage from "../pages/landingPage/LandingPage";
 import Pricing from "../pages/subscriptions/pricing/Pricing";
@@ -20,6 +18,7 @@ import Subscribe from "../pages/subscriptions/subscribe/Subscribe";
 import Account from "../pages/subscriptions/accountstatus/Account";
 import Cancel from "../pages/subscriptions/accountstatus/Cancel";
 import PrivateRoute from "./PrivateRoute";
+
 
 const routes = createBrowserRouter([
   {
@@ -39,7 +38,7 @@ const routes = createBrowserRouter([
         // element: <DatabaseButton />,
         element: (
           <PrivateRoute>
-            <DatabaseButton />
+            <DatabaseButton/>
           </PrivateRoute>
         ),
       },
@@ -48,7 +47,7 @@ const routes = createBrowserRouter([
         // element: <DatabaseList />,
         element: (
           <PrivateRoute>
-            <DatabaseList />
+            <DatabaseList/>
           </PrivateRoute>
         ),
       },
@@ -57,7 +56,7 @@ const routes = createBrowserRouter([
         // element: <DatabaseTable />,
         element: (
           <PrivateRoute>
-            <DatabaseTable />
+            <DatabaseTable/>
           </PrivateRoute>
         ),
       },

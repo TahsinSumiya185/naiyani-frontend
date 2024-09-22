@@ -1,113 +1,316 @@
-import { useState, useEffect } from 'react';
-import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { useStripe, useElements, CardNumberElement, CardExpiryElement, CardCvcElement } from '@stripe/react-stripe-js';
+import { useEffect, useState } from 'react';
+import { FaArrowAltCircleRight } from "react-icons/fa";
+import '../subscribe/Subcribe.css'
+import { DownOutlined } from '@ant-design/icons';
+import { Dropdown, Menu, Space, Typography } from 'antd';
 import { Navigate, useLocation } from 'react-router-dom';
-import Alert from '../../../components/alert/Alert';
-import Navbar1 from '../../../components/navbar/Navbar1';
-import StripeWrapper from '../../../context/StripeWrapper';
 
 const Subscribe = () => {
-  const location = useLocation();
-  const [clientSecret, setClientSecret] = useState(location.state?.clientSecret || '');
-  const [subscriptionId, setSubscriptionId] = useState(location.state?.subscriptionId || '');
-  const [name, setName] = useState('Jenny Rosen');
-  const [messages, setMessages] = useState('');
-  const [paymentIntent, setPaymentIntent] = useState(null);
-  const [loading, setLoading] = useState(false);
-
   const stripe = useStripe();
   const elements = useElements();
-  console.log("Received state in Subscribe component: ", location.state);
+  const location = useLocation();
 
+  const [clientSecret, setClientSecret] = useState(location.state?.clientSecret || '');
+  const [subscriptionId, setSubscriptionId] = useState(location.state?.subscriptionId || '');
+  const [cardHolderName, setCardHolderName] = useState('');
+  const [paymentIntent, setPaymentIntent] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [messages, setMessages] = useState('');
+  const [postalCode, setPostalCode] = useState('');
+  const [postalCodeError, setPostalCodeError] = useState('');
+  const [selectedItem, setSelectedItem] = useState('Select Province');
+
+  // Log clientSecret and subscriptionId when the component loads
   useEffect(() => {
+    console.log('ClientSecret:', clientSecret);
+    console.log('SubscriptionId:', subscriptionId);
+    
     if (!clientSecret || !subscriptionId) {
       setMessages('Client secret or subscription ID is missing. Please try again.');
     }
   }, [clientSecret, subscriptionId]);
 
   if (!stripe || !elements) {
-    return null;
+    return null; // Stripe or Elements not loaded yet
   }
+  const handlePostalCodeChange = (e) => {
+    const input = e.target.value.toUpperCase();
+    const lastChar = input.slice(-1);
+    const previousInput = input.slice(0, -1);
 
+    if (previousInput.length % 2 === 0 && /[A-Za-z]/.test(lastChar)) {
+      setPostalCode(input);
+      setPostalCodeError('');
+    } else if (previousInput.length % 2 !== 0 && /\d/.test(lastChar)) {
+      setPostalCode(input);
+      setPostalCodeError('');
+    } else if (previousInput.length === 3 && /\s/.test(lastChar)) {
+      setPostalCode(input);
+      setPostalCodeError('');
+    } else {
+      setPostalCodeError('Please enter the postal code in the format A1A 1A1');
+    }
+  };
+  const handleMenuClick = (e) => {
+    setSelectedItem(e.key);
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
-    const cardElement = elements.getElement(CardElement);
+    // Log the card elements to ensure they are correctly retrieved
+    const cardNumberElement = elements.getElement(CardNumberElement);
+    const cardExpiryElement = elements.getElement(CardExpiryElement);
+    const cardCvcElement = elements.getElement(CardCvcElement);
 
-    const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
-      payment_method: {
-        card: cardElement,
-        billing_details: {
-          name: name,
-        }
-      }
-    });
+    console.log('CardNumberElement:', cardNumberElement);
+    console.log('CardExpiryElement:', cardExpiryElement);
+    console.log('CardCvcElement:', cardCvcElement);
 
-    if (error) {
-      setMessages(error.message);
+    if (!clientSecret) {
+      setMessages('Client secret is not available.');
+      console.log('Client secret is missing.');
       setLoading(false);
       return;
     }
 
-    setPaymentIntent(paymentIntent);
-    setLoading(false);
-  }
+    try {
+      const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+        payment_method: {
+          card: cardNumberElement,
+          billing_details: {
+            name: cardHolderName,
+          },
+        },
+      });
 
+      if (error) {
+        console.error('Payment error:', error);
+        setMessages(error.message);
+        setLoading(false);
+      } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+        setPaymentIntent(paymentIntent);
+        console.log('Payment succeeded:', paymentIntent);
+        setLoading(false);
+      }
+    } catch (err) {
+      console.error('Error during payment:', err);
+      setMessages('An error occurred during payment. Please try again.');
+      setLoading(false);
+    }
+  };
+
+  // Redirect to account page if payment is successful
   if (paymentIntent && paymentIntent.status === 'succeeded') {
     return <Navigate to="/account" />;
   }
-
+  const items = (
+    <Menu onClick={handleMenuClick} style={{ boxShadow: "0 4px 8px rgba(26, 25, 25, 0.25)", borderRadius: "20px" }}>
+      <Menu.Item key="Alberta">Alberta</Menu.Item>
+      <Menu.Item key="British Columbia">British Columbia</Menu.Item>
+      <Menu.Item key="Manitoba">Manitoba</Menu.Item>
+      <Menu.Item key="New Brunswick">New Brunswick</Menu.Item>
+      <Menu.Item key="Newfoundland and Labrador">Newfoundland and Labrador</Menu.Item>
+      <Menu.Item key="Northwest Territories">Northwest Territories</Menu.Item>
+      <Menu.Item key="Nova Scotia">Nova Scotia</Menu.Item>
+      <Menu.Item key="Nunavut">Nunavut</Menu.Item>
+      <Menu.Item key="Ontario">Ontario</Menu.Item>
+      <Menu.Item key="Prince Edward Island">Prince Edward Island</Menu.Item>
+      <Menu.Item key="Quebec">Quebec</Menu.Item>
+      <Menu.Item key="Saskatchewan">Saskatchewan</Menu.Item>
+      <Menu.Item key="Yukon">Yukon</Menu.Item>
+    </Menu>
+  );
   return (
-    <>
-
-
-    <div className='lg:px-32 px-8'>
-      <Navbar1 />
-      <h1 className='text-center text-gray-400 text-3xl'>| Subscribe |</h1>
-      <div className='flex justify-center items-center mx-auto'>
-        <div className="max-w-xl p-6 bg-gray-100 border border-gray-300 rounded-lg"
-          style={{ boxShadow: 'rgba(0, 0, 0, 0.4) 0px 2px 4px, rgba(0, 0, 0, 0.3) 0px 7px 13px -3px, rgba(0, 0, 0, 0.2) 0px -3px 0px inset' }}>
-          <div>
-            <p className='text-xl text-cyan-700'>Try the successful test card: <span>4242424242424242</span>.</p>
-            <p className='text-xl text-cyan-700'>Try the test card that requires SCA: <span>4000002500003155</span>.</p>
-            <p className='text-xl text-cyan-700'>Use any <i>future</i> expiry date, CVC, 5-digit postal code</p>
-            <hr />
-            <form onSubmit={handleSubmit} className='my-10'>
-              <div className="relative z-0 w-full mb-5 group">
-                <input type="text" name="floating_email" id="floating_email" value={name} onChange={(e) => setName(e.target.value)}
-                  className="block py-2.5 px-0 w-full text-lg text-cyan-700 bg-transparent border-0 border-b-2 border-gray-300 appearance-none
-                  focus:outline-none focus:ring-0 focus:text-cyan-700 peer" placeholder=" " required />
-                <label className="peer-focus:font-medium absolute text-lg text-cyan-700 duration-300 transform -translate-y-6
-                  scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-cyan-700
-                  peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Full Name</label>
-              </div>
-              <div className='my-5'>
-                <Alert message={messages} />
-                <CardElement />
-              </div>
-              <button type="submit" className="relative inline-flex items-center justify-center p-4 px-6 py-3 overflow-hidden bg-gray-200 font-medium text-gray-700 transition
-                duration-300 ease-out border-2 border-gray-500 rounded-full shadow-lg group" disabled={loading}>
-                <span className="absolute flex items-center border-2 border-gray-500 justify-center w-full h-full text-gray-700 duration-300 -translate-x-full
-                  bg-gray-400 group-hover:translate-x-0 ease">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-                  </svg>
-                </span>
-                <span className="absolute flex items-center justify-center w-full h-full text-gray-600 font-semibold 
-                transition-all duration-300 transform group-hover:translate-x-full ease">Subscribe</span>
-                <span className="relative invisible">Subscribe</span>
-              </button>
-            </form>
-          </div>
-        </div>
-      </div>
+    <form onSubmit={handleSubmit} className='w-full max-w-7xl mx-auto my-10 p-6'>
+    <div>
+      <p className='text-fonts font-semibold'>Billing Information</p>
     </div>
+<div className="grid md:grid-cols-2 md:gap-6">
+  <div className="gradient-button z-0 w-full mb-5 group">
+  <input
+        type="text"
+        placeholder="First Name"
+        // value={cardHolderName}
+        // onChange={(e) => setCardHolderName(e.target.value)}
+        className="w-full h-full expanding-input"
+        required
+      />
+  </div>
+  <div className="gradient-button z-0 w-full mb-5 group">
+  <input
+        type="text"
+        placeholder="Last Name"
+        // value={cardHolderName}
+        // onChange={(e) => setCardHolderName(e.target.value)}
+        className="w-full h-full expanding-input"
+        required
+      />
+  </div>
+</div>
+
+
+  <div className="gradient-button z-0 w-full mb-5 group">
+  <input
+        type="text"
+        placeholder="Address"
+        // value={cardHolderName}
+        // onChange={(e) => setCardHolderName(e.target.value)}
+        className="w-full h-full expanding-input"
+        required
+      />
+  </div>
+
+
+  <div className="grid md:grid-cols-2 md:gap-6">
+  <div className="gradient-button z-0 w-full mb-5 group">
+  <input
+        type="text"
+        placeholder="City"
+        // value={cardHolderName}
+        // onChange={(e) => setCardHolderName(e.target.value)}
+        className="w-full h-full expanding-input"
+        required
+      />
+  </div>
+  <div className="gradient-button z-0 w-full mb-5">
+<Dropdown overlay={items} trigger={['click']} className="expanding-input">
+  <Typography.Link className="dropdown-link">
+    <Space>
+      {selectedItem} {/* Display selected item */}
+      <DownOutlined />
+    </Space>
+  </Typography.Link>
+</Dropdown>
+
+  </div>
+  
+</div>
+
+<div className="grid md:grid-cols-2 md:gap-6">
+<div className="gradient-button z-0 w-full mb-5 group">
+<div>
+  <input
+    type="text"
+    placeholder="Postal Code"
+    value={postalCode}
+    onChange={handlePostalCodeChange}
+    className="w-full h-full expanding-input"
+    maxLength={7} // 6 characters + 1 space
+    required
+  />
+  {postalCodeError && <p className="text-red-500">{postalCodeError}</p>}
+  </div>
+</div>
+  <div className="gradient-button z-0 w-full mb-5 group">
+  <input
+        type="text"
+        placeholder="Canada"
+        // value={cardHolderName}
+        // onChange={(e) => setCardHolderName(e.target.value)}
+        className="w-full h-full expanding-input"
+       disabled
+      />
+  </div>
+  
+</div>
+
+
+<div>
+<div>
+      <p className='text-fonts font-semibold'>Payment Information</p>
+    </div>
+
+    <div className="gradient-button z-0 w-full mb-5 group">
+  <input
+        type="text"
+        placeholder="Cardholder's Name"
+        value={cardHolderName}
+        onChange={(e) => setCardHolderName(e.target.value)}
+        className="w-full h-full expanding-input"
+        required
+      />
+  </div>
+
+
+
+  <div className="grid md:grid-cols-4  md:gap-6">
+<div className="gradient-button col-span-2 z-0  w-full mb-5">
+  <CardNumberElement
+    options={{
+      style: {
+        base: {
+          textAlign: 'center',
+          '::placeholder': {
+            font: '1rem/3 sans-serif',
+            fontWeight: 'bold',
+            color: '#a1a1a1',
+            textAlign: 'center',
+          },
+        },
+      },
+    }}
+    className="w-full bg-white expanding-input text-center placeholder-center"
+  />
+</div>
+
+<div className="gradient-button z-0 col-span-1  w-full mb-5">
+  <CardExpiryElement
+    options={{
+      style: {
+        base: {
+          textAlign: 'center',
+          '::placeholder': {
+            font: '1rem/3 sans-serif',
+            fontWeight: 'bold',
+            color: '#a1a1a1',
+            textAlign: 'center',
+          },
+        },
+      },
+    }}
+    className="w-full bg-white expanding-input text-center placeholder-center"
+  />
+</div>
+<div className="gradient-button z-0 w-full   mb-5">
+  <CardCvcElement
+    options={{
+      style: {
+        base: {
+          textAlign: 'center',
+          '::placeholder': {
+            font: '1rem/3 sans-serif',
+            fontWeight: 'bold',
+            color: '#a1a1a1',
+            textAlign: 'center',
+          },
+        },
+      },
+    }}
+    className="w-full bg-white expanding-input"
+  />
+</div>
+
+</div>
+
+</div>
   
 
-   
-    </>
- 
+<div className='flex justify-end mt-8'>
+          <button
+            style={{
+              boxShadow: "1px 4px 2px rgba(26, 25, 25, 0.25)",
+            }}
+            className="rounded-2xl text-gray-600 hover:bg-gray-600 hover:text-white border-none font-semibold text-[16px] flex items-center justify-between py-1 cursor-pointer"
+         
+          >
+            <span className="px-5">SUBMIT</span>
+            <FaArrowAltCircleRight className="h-[18px] w-[18px]" />
+          </button>
+        </div>
+  </form>
   );
-}
+};
 
 export default Subscribe;

@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
-import reloadIcon from "../../assets/img/refresh.png";
-import { SideBySideMagnifier } from "react-image-magnifiers";
+
 import Zoom from 'react-medium-image-zoom'
 import { Dropdown, Menu, Input } from "antd";
 import { IoMdRefreshCircle } from "react-icons/io";

@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import "./DatabaseList.css";
-import TopBar from "../../components/topBar/TopBar";
-import CustomButton from "../../components/customButton/CustomButton";
+import TopBar from "../../../components/topBar/TopBar";
+import CustomButton from "../../../components/customButton/CustomButton";
 
 const DatabaseList = () => {
   const listItems = [
