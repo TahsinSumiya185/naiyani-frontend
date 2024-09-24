@@ -32,7 +32,7 @@ const Navbar1 = () => {
             <img src={menuIcon} alt="" />
           </button>
         </div>
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mx-5 md:mx-24">
           <div className="flex items-center gap-24">
             <div className="text-left ">
               <NavLink

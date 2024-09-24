@@ -15,9 +15,11 @@ import FilteringVideo from "../../components/landingPage/FilteringVideo";
 
 const LandingPage = () => {
   return (
-    <div className="lg:px-32 px-8 font-sans">
+    <>
+          <Navbar1 />
+        <div className="lg:px-32 px-8 font-sans">
       {/*  */}
-      <Navbar1 />
+
 
       {/* product DB div */}
       <div className="lg:flex lg:flex-row ">
@@ -175,6 +177,8 @@ const LandingPage = () => {
 
       <Footer />
     </div>
+    </>
+
   );
 };
 

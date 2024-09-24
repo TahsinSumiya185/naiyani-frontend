@@ -57,24 +57,21 @@ const Subscribe = () => {
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
+  
+    // Disable the submit button to prevent multiple submissions
+    if (loading) return;
     setLoading(true);
-
-    // Log the card elements to ensure they are correctly retrieved
+  
     const cardNumberElement = elements.getElement(CardNumberElement);
     const cardExpiryElement = elements.getElement(CardExpiryElement);
     const cardCvcElement = elements.getElement(CardCvcElement);
-
-    console.log('CardNumberElement:', cardNumberElement);
-    console.log('CardExpiryElement:', cardExpiryElement);
-    console.log('CardCvcElement:', cardCvcElement);
-
+  
     if (!clientSecret) {
       setMessages('Client secret is not available.');
-      console.log('Client secret is missing.');
       setLoading(false);
       return;
     }
-
+  
     try {
       const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
         payment_method: {
@@ -84,23 +81,20 @@ const Subscribe = () => {
           },
         },
       });
-
+  
       if (error) {
-        console.error('Payment error:', error);
         setMessages(error.message);
-        setLoading(false);
       } else if (paymentIntent && paymentIntent.status === 'succeeded') {
         setPaymentIntent(paymentIntent);
-        console.log('Payment succeeded:', paymentIntent);
-        setLoading(false);
+        setMessages('Payment succeeded');
       }
     } catch (err) {
-      console.error('Error during payment:', err);
       setMessages('An error occurred during payment. Please try again.');
-      setLoading(false);
+    } finally {
+      setLoading(false);  // Re-enable the button after the process completes
     }
   };
-
+  
   // Redirect to account page if payment is successful
   if (paymentIntent && paymentIntent.status === 'succeeded') {
     return <Navigate to="/account" />;
@@ -298,16 +292,15 @@ const Subscribe = () => {
   
 
 <div className='flex justify-end mt-8'>
-          <button
-            style={{
-              boxShadow: "1px 4px 2px rgba(26, 25, 25, 0.25)",
-            }}
-            className="rounded-2xl text-gray-600 hover:bg-gray-600 hover:text-white border-none font-semibold text-[16px] flex items-center justify-between py-1 cursor-pointer"
-         
-          >
-            <span className="px-5">SUBMIT</span>
-            <FaArrowAltCircleRight className="h-[18px] w-[18px]" />
-          </button>
+<button
+  style={{ boxShadow: "1px 4px 2px rgba(26, 25, 25, 0.25)" }}
+  className={`rounded-2xl text-gray-600 hover:bg-gray-600 hover:text-white border-none font-semibold text-[16px] flex items-center justify-between py-1 cursor-pointer ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+  disabled={loading}  // Disable the button when loading
+>
+  <span className="px-5">SUBMIT</span>
+  <FaArrowAltCircleRight className="h-[18px] w-[18px]" />
+</button>
+
         </div>
   </form>
   );

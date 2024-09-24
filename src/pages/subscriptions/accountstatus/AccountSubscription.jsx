@@ -1,6 +1,5 @@
-
 import { Link } from 'react-router-dom';
-import StripeWrapper from '../../../context/StripeWrapper';
+import { FaArrowAltCircleRight } from "react-icons/fa";
 
 const AccountSubscription = ({ subscription }) => {
   const getStatusColor = (status) => {
@@ -17,39 +16,44 @@ const AccountSubscription = ({ subscription }) => {
   };
 
   return (
-    <>
-
-    <section className='flex justify-center 'data-aos="fade-up">
-      <div className="p-6 bg-gray-100 hover:bg-gray-200 border my-5 border-gray-200 rounded-xl  mx-5"
-      style={{ boxShadow: 'rgba(0, 0, 0, 0.4) 0px 2px 4px, rgba(0, 0, 0, 0.3) 0px 7px 13px -3px, rgba(0, 0, 0, 0.2) 0px -3px 0px inset'}}
+    <section className='flex justify-center' data-aos="fade-up">
+      <div className="p-6 bg-white hover:bg-gray-200 border-none my-5 rounded-xl mx-5"
+        style={{
+          boxShadow: "1px 4px 2px rgba(26, 25, 25, 0.25)",
+          padding: "10px",
+          border: "1px solid #ccc",
+          borderRadius: "4px",
+        }}
       >
         <h4>
-          <a className='text-cyan-700' href={`https://dashboard.stripe.com/test/subscriptions/${subscription.id}`}>
+          <a className='text-gray-500' href={`https://dashboard.stripe.com/test/subscriptions/${subscription.id}`}>
             Account Id: {subscription.id}
           </a>
         </h4>
 
-        <p className='font-semibold text-lg text-cyan-700'>
+        <p className='font-semibold text-lg text-gray-500'>
           Status: <span className={getStatusColor(subscription.status)}>{subscription.status}</span>
         </p>
 
-        <p className='text-lg text-cyan-700'>
+        <p className='text-lg text-gray-500'>
           Card last: {subscription.default_payment_method?.card?.last4}
         </p>
 
-        <p className='text-lg text-cyan-700'>
+        <p className='text-lg text-gray-500'>
           Current period end: {new Date(subscription.current_period_end * 1000).toString()}
         </p>
 
-        <Link to={`/cancel`} state={{ subscription: subscription.id }} className='bg-gray-300 py-3 px-8 transition ease-in-out delay-150 
-          hover:-translate-y-1 hover:scale-110 text-gray-700 rounded-2xl hover:bg-slate-300'>
-          Cancel
+        <Link to={`/cancel`} state={{ subscription: subscription.id }}
+          style={{
+            boxShadow: "1px 4px 2px rgba(26, 25, 25, 0.25)",
+          }}
+          className="rounded-2xl bg-gray-200 text-gray-600 hover:bg-gray-600 hover:text-white border-none font-semibold text-[16px] py-1 cursor-pointer"
+        >
+          <span className="px-5">SUBMIT</span>
+          <FaArrowAltCircleRight className="h-[18px] w-[16px] -mb-1 mx-2" />
         </Link>
       </div>
     </section>
-
-    </>
-   
   );
 };
 
