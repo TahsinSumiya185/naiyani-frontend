@@ -1,0 +1,59 @@
+
+
+
+.custom-modal .ant-modal-header {
+    color: #b91616 !important;
+    font-weight: bold;
+}
+
+.custom-modal .ant-modal-body {
+    text-align: center;
+}
+
+.custom-modal .footer-buttons {
+    display: flex;
+    justify-content: flex-end; 
+    margin-top: 1rem;
+}
+
+.custom-modal .ant-modal-footer {
+    justify-content: center; 
+}
+
+.custom-modal .ant-modal-close-x {
+    color: #963939;
+}
+
+.custom-modal .ant-btn-primary {
+    background-color: #d81e56;
+    border-color: #963939;
+}
+
+.custom-modal .ant-btn-primary:hover {
+    background-color: #7a2929;
+}
+
+.custom-modal .custom-button {
+    box-shadow: 1px 4px 2px rgba(26, 25, 25, 0.25);
+    border-radius: 1rem; 
+    color: #4a5568; 
+    background-color: rgb(233, 231, 231); 
+    border: none; 
+    font-weight: 600; 
+    padding: 0.25rem 1rem;
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    cursor: pointer; 
+}
+
+.custom-modal .custom-button:hover {
+    background-color: #4a5568; 
+    color: white; 
+}
+
+.custom-modal .custom-button .icon {
+    height: 18px; 
+    width: 18px;
+    padding: 3px 3px; 
+}

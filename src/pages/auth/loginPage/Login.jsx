@@ -75,35 +75,59 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     try {
       const payloadObj = {
         email: email,
         password: password,
       };
-
+  
       const res = await userLogin(payloadObj);
-
+  
       if (res?.data?.data?.access_token) {
-        message.success({
-          content: "Login Successful",
-          key: "login-loading",
-          duration: 3,
-        });
-        navigate("/database-btn");
+        // Store the access token
+        storeUserInfo({ accessToken: res?.data?.data?.access_token });
+  
+        // Retrieve customer ID from the response
+        const customerId = res?.data?.data?.customer_id;
+  
+        // Get the last visited page from localStorage (if any) or default to home page
+        const lastVisitedPage = localStorage.getItem('lastVisitedPage') || '/database-btn';
+  
+        // Check if customer ID exists
+        if (!customerId) {
+          // If customer ID is not found, redirect to pricing
+          message.warning({
+            content: "Customer ID not found, Please subscribe",
+            key: "login-warning",
+            duration: 5,
+          });
+          navigate("/pricing");
+        } else {
+          // If customer ID is found, redirect to the last visited page or database button
+          message.success({
+            content: "Login Successful",
+            key: "login-loading",
+            duration: 3,
+          });
+          navigate(lastVisitedPage);
+  
+          // Clear the stored last visited page after successful login
+          localStorage.removeItem('lastVisitedPage');
+        }
       }
-      storeUserInfo({ accessToken: res?.data?.data?.access_token });
-
+  
       if (res?.error) {
+        // Show error message if login fails
         message.error(res?.error?.data?.data?.detail);
       }
-
+  
       console.log("response", res);
     } catch (error) {
       console.error(error);
     }
   };
-
+  
   if (isLoading) {
     return <Loading />;
   }

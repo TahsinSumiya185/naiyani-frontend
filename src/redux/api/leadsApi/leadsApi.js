@@ -28,9 +28,11 @@ export const leadsApi = baseApi.injectEndpoints({
     }),
 
     // API for refreshing ASIN
-    refreshAsin: builder.query({
+    refreshAsin: builder.mutation({
       query: (asin) => ({
         url: `spapi/refresh/${asin}/`,
+        method: 'POST',
+        body: { asin },
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },

@@ -5,7 +5,8 @@ import '../subscribe/Subcribe.css'
 import { DownOutlined } from '@ant-design/icons';
 import { Dropdown, Menu, Space, Typography } from 'antd';
 import { Navigate, useLocation } from 'react-router-dom';
-
+import Navbar1 from '../../../components/navbar/Navbar1';
+import Footer from '../../../layouts/Footer'
 const Subscribe = () => {
   const stripe = useStripe();
   const elements = useElements();
@@ -117,7 +118,10 @@ const Subscribe = () => {
     </Menu>
   );
   return (
-    <form onSubmit={handleSubmit} className='w-full max-w-7xl mx-auto my-10 p-6'>
+    <>
+<Navbar1/>
+<div className="lg:px-32 px-8 font-sans">
+<form onSubmit={handleSubmit} className='w-full max-w-7xl mx-auto my-10 p-6'>
     <div>
       <p className='text-fonts font-semibold'>Billing Information</p>
     </div>
@@ -303,6 +307,10 @@ const Subscribe = () => {
 
         </div>
   </form>
+ <Footer/>
+</div>
+    
+  </>
   );
 };
 

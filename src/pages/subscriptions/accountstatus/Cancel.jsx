@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useCancelSubscriptionMutation } from '../../../redux/api/payment/paymentApi';
 import { FaArrowAltCircleRight } from "react-icons/fa";
+import Navbar1 from '../../../components/navbar/Navbar1';
+import Footer from '../../../layouts/Footer';
 const Cancel = () => {
   const [cancelled, setCancelled] = useState(false);
   const location = useLocation();
@@ -33,7 +35,9 @@ const Cancel = () => {
 
   return (
     <>
-      <div className="flex items-center justify-center min-h-screen bg-white shaodw-md">
+    <Navbar1/>
+    <div className='lg:px-32 px-8'>
+      <div className="flex items-center justify-center  bg-white shaodw-md">
         <div
           className="w-96 max-h-lg p-6 bg-white border border-gray-200 rounded-lg "
           style={{
@@ -61,6 +65,8 @@ const Cancel = () => {
           </button>
           </div>
         </div>
+      </div>
+      <Footer/>
       </div>
     </>
   );

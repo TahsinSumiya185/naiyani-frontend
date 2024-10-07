@@ -15,18 +15,18 @@ import Loading from "./components/loading/Loading";
 
 const RootComponent = () => {
   const [stripePromise, setStripePromise] = useState(null);
-  const { data, error } = useGetConfigQuery(); // Fetch config (including publishableKey)
+  const { data, error } = useGetConfigQuery(); 
 
   useEffect(() => {
-    // Assuming `data` contains a nested object
+
     const publishableKey = data?.data?.publishableKey;
 
-    console.log(publishableKey);
-    console.log(stripePromise);
+    console.log("publishkey",publishableKey);
+    console.log("strpe",stripePromise);
 
     if (publishableKey) {
-      const stripe = loadStripe(publishableKey); // Initialize Stripe instance
-      setStripePromise(stripe); // Store in component state
+      const stripe = loadStripe(publishableKey); 
+      setStripePromise(stripe); 
     }
   }, [data]);
 

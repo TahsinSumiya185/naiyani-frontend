@@ -3,6 +3,7 @@ import AccountSubscription from './AccountSubscription';
 import Navbar1 from '../../../components/navbar/Navbar1';
 import { useGetAllSubscriptionsQuery } from '../../../redux/api/payment/paymentApi';
 import Loading from '../../../components/loading/Loading';
+import Footer from '../../../layouts/Footer';
 
 const Account = () => {
   const { data, error, isLoading } = useGetAllSubscriptionsQuery();
@@ -18,11 +19,14 @@ const Account = () => {
 
   return (
     <>
+    
       {isLoading ? (
         <Loading />
       ) : (
+        <>
+         <Navbar1/>
         <div className='lg:px-32 px-8'>
-          <Navbar1 />
+      
           <h1 data-aos="zoom-in" className='text-center text-gray-400 text-3xl'>| Account Status |</h1>
           <div className='flex justify-between mx-5'>
             <a href="/pricing" className='text-xl text-gray-400 hover:text-cyan-700 hover:underline font-semibold' data-aos="fade-right">Add a subscription</a>
@@ -41,7 +45,11 @@ const Account = () => {
               <p>No subscriptions available</p>
             )}
           </div>
+          <Footer/>
         </div>
+      
+        </>
+       
       )}
     </>
   );

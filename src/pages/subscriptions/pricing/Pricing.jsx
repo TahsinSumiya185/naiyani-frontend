@@ -5,11 +5,14 @@ import Navbar1 from "../../../components/navbar/Navbar1";
 import PricingCards from './PricingCards';
 import { useGetConfigQuery, useCreateSubscriptionMutation } from '../../../redux/api/payment/paymentApi';
 import Loading from "../../../components/loading/Loading";
+import { isLoggedIn } from "../../../services/auth.service";
+import ConfirmModal from "../../../components/modal/ConfirmModal";
 
 const Pricing = () => {
-  const [showMonthly, setShowMonthly] = React.useState(true);
-  const [showYearly, setShowYearly] = React.useState(false);
-  const [isLoadingSubscription, setIsLoadingSubscription] = useState(false); // Add loading state for subscription
+  const [showMonthly, setShowMonthly] = useState(true);
+  const [showYearly, setShowYearly] = useState(false);
+  const [isLoadingSubscription, setIsLoadingSubscription] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false); // State for modal visibility
   const navigate = useNavigate();
 
   const { data: pricesData, error, isLoading } = useGetConfigQuery();
@@ -32,12 +35,17 @@ const Pricing = () => {
   };
 
   const handleCreateSubscription = async (priceId) => {
-    setIsLoadingSubscription(true); // Start loading
+    if (!isLoggedIn()) { 
+      setIsModalVisible(true); 
+      return; 
+    }
+
+    setIsLoadingSubscription(true);
     try {
       const response = await createSubscription(priceId).unwrap();
       console.log(response);
   
-      const { subscriptionId, clientSecret } = response.data; // Adjust to access the data object
+      const { subscriptionId, clientSecret } = response.data;
   
       if (subscriptionId && clientSecret) {
         navigate("/subscribe", {
@@ -52,12 +60,20 @@ const Pricing = () => {
     } catch (error) {
       console.error("Error creating subscription:", error);
     } finally {
-      setIsLoadingSubscription(false); // Stop loading
+      setIsLoadingSubscription(false);
     }
   };
-  
 
-  if (isLoading || isLoadingSubscription) return <Loading />; // Show loading while fetching or creating a subscription
+  const handleModalOk = () => {
+    setIsModalVisible(false); 
+    navigate("/login"); 
+  };
+
+  const handleModalCancel = () => {
+    setIsModalVisible(false); 
+  };
+
+  if (isLoading || isLoadingSubscription) return <Loading />;
   if (error) return <div>Error loading prices</div>;
 
   return (
@@ -73,30 +89,36 @@ const Pricing = () => {
             style={{ boxShadow: "1px 4px 2px rgba(26, 25, 25, 0.25)" }}
             className="w-[175px] rounded-[50px] mx-auto flex justify-center items-center"
           >
-<button
-  className={`border-none cursor-pointer rounded-[30px] text-sm py-2 px-5 ${showMonthly ? "bg-[#963939] font-semibold text-white" : "bg-white text-[#A1A1A1]"}`}
-  onClick={handleMonthlyClick}
->
-  Monthly
-</button>
-<button
-  className={`border-none cursor-pointer rounded-[30px] text-sm py-2 px-5 ${showYearly ? "bg-[#963939] font-semibold text-white" : "bg-white text-[#A1A1A1]"}`}
-  onClick={handleYearlyClick}
->
-  Yearly
-</button>
-
+            <button
+              className={`border-none cursor-pointer rounded-[30px] text-sm py-2 px-5 ${showMonthly ? "bg-[#963939] font-semibold text-white" : "bg-white text-[#A1A1A1]"}`}
+              onClick={handleMonthlyClick}
+            >
+              Monthly
+            </button>
+            <button
+              className={`border-none cursor-pointer rounded-[30px] text-sm py-2 px-5 ${showYearly ? "bg-[#963939] font-semibold text-white" : "bg-white text-[#A1A1A1]"}`}
+              onClick={handleYearlyClick}
+            >
+              Yearly
+            </button>
           </div>
         </div>
 
         <PricingCards
-  isLoading={isLoadingSubscription}
-  prices={pricesData?.data?.prices?.data || []}  // Adjusted path to match your API response
-  showMonthly={showMonthly}
-  showYearly={showYearly}
-  createSubscription={handleCreateSubscription}
-/>
+          isLoading={isLoadingSubscription}
+          prices={pricesData?.data?.prices?.data || []}
+          showMonthly={showMonthly}
+          showYearly={showYearly}
+          createSubscription={handleCreateSubscription}
+        />
 
+        <ConfirmModal
+          isOpen={isModalVisible}
+          onConfirm={handleModalOk}
+          onCancel={handleModalCancel}
+          msg='You need to log in to create a subscription. Please log in to continue.'
+          btnMsg='Go to login'
+        />
 
         <div className="mt-32">
           <Footer />

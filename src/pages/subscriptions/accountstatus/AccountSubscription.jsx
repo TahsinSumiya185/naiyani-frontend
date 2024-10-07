@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { FaArrowAltCircleRight } from "react-icons/fa";
+import Navbar1 from '../../../components/navbar/Navbar1';
 
 const AccountSubscription = ({ subscription }) => {
   const getStatusColor = (status) => {
@@ -16,7 +17,9 @@ const AccountSubscription = ({ subscription }) => {
   };
 
   return (
-    <section className='flex justify-center' data-aos="fade-up">
+    <>
+  
+       <section className='flex justify-center' data-aos="fade-up">
       <div className="p-6 bg-white hover:bg-gray-200 border-none my-5 rounded-xl mx-5"
         style={{
           boxShadow: "1px 4px 2px rgba(26, 25, 25, 0.25)",
@@ -49,11 +52,13 @@ const AccountSubscription = ({ subscription }) => {
           }}
           className="rounded-2xl bg-gray-200 text-gray-600 hover:bg-gray-600 hover:text-white border-none font-semibold text-[16px] py-1 cursor-pointer"
         >
-          <span className="px-5">SUBMIT</span>
+          <span className="px-5">Cancel</span>
           <FaArrowAltCircleRight className="h-[18px] w-[16px] -mb-1 mx-2" />
         </Link>
       </div>
     </section>
+    </>
+ 
   );
 };
 
