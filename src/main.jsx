@@ -6,23 +6,37 @@ import store from "./redux/store";
 import { RouterProvider } from "react-router-dom";
 import routes from "./routes/index";
 import { Elements } from "@stripe/react-stripe-js";
- // Use existing paymentApi for Stripe config
- // To store Stripe instance
-
 import { useGetConfigQuery } from "./redux/api/payment/paymentApi";
 import { loadStripe } from "@stripe/stripe-js";
 import Loading from "./components/loading/Loading";
+import { setUserInfo } from "./redux/api/auth/authSlice";
+import { getFromLocalStorage } from "./utils/localStorage";
 
 const RootComponent = () => {
   const [stripePromise, setStripePromise] = useState(null);
   const { data, error } = useGetConfigQuery(); 
+  const dispatch = useDispatch(); // Move useDispatch here
+
+  // Load user info from localStorage
+// Load user info from localStorage
+useEffect(() => {
+  const storedUserInfo = {
+    firstName: getFromLocalStorage("firstName"),
+    email: getFromLocalStorage("email"),
+    accessToken: getFromLocalStorage("accessToken"),
+  };
+  
+  if (storedUserInfo.firstName && storedUserInfo.email) {
+    dispatch(setUserInfo(storedUserInfo));
+  }
+}, [dispatch]);
+
 
   useEffect(() => {
-
     const publishableKey = data?.data?.publishableKey;
 
-    console.log("publishkey",publishableKey);
-    console.log("strpe",stripePromise);
+    console.log("publishkey", publishableKey);
+ 
 
     if (publishableKey) {
       const stripe = loadStripe(publishableKey); 
@@ -31,7 +45,7 @@ const RootComponent = () => {
   }, [data]);
 
   if (error) {
-    return <Loading/>;
+    return <Loading />;
   }
 
   return stripePromise ? (
@@ -39,10 +53,9 @@ const RootComponent = () => {
       <RouterProvider router={routes} />
     </Elements>
   ) : (
-    <Loading/>
+    <Loading />
   );
 };
-
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(

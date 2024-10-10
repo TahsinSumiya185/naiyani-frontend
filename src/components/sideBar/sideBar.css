@@ -1,0 +1,26 @@
+/* Target only the menu items inside Sider */
+.ant-layout-sider .ant-menu-item {
+    color: gray;
+    font-weight: 500;
+  }
+  
+  /* Target only the selected items inside Sider */
+  .ant-layout-sider .ant-menu-item-selected {
+    background-color: #f5f5f5;
+    color: gray;
+  }
+  
+  .ant-table
+    .ant-table-container
+    .ant-table-content
+    table
+    thead.ant-table-thead
+    .ant-table-cell {
+    background-color: gray;
+    color: white;
+    width: 100px;
+    font-weight: 600;
+    text-align: center;
+    font-size: 15px;
+  }
+  

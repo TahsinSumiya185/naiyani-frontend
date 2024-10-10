@@ -18,6 +18,9 @@ import Subscribe from "../pages/subscriptions/subscribe/Subscribe";
 import Account from "../pages/subscriptions/accountstatus/Account";
 import Cancel from "../pages/subscriptions/accountstatus/Cancel";
 import PrivateRoute from "./PrivateRoute";
+import Setiings from "../pages/settings/Setiings";
+import PersonalInformation from "../pages/settings/personalInformation/PersonalInformation";
+import PaymentInformation from "../pages/settings/paymentInformation/paymentInformation";
 
 
 const routes = createBrowserRouter([
@@ -35,28 +38,25 @@ const routes = createBrowserRouter([
       },
       {
         path: "/database-btn",
-        // element: <DatabaseButton />,
         element: (
           <PrivateRoute>
-            <DatabaseButton/>
+            <DatabaseButton />
           </PrivateRoute>
         ),
       },
       {
         path: "/database-list",
-        // element: <DatabaseList />,
         element: (
           <PrivateRoute>
-            <DatabaseList/>
+            <DatabaseList />
           </PrivateRoute>
         ),
       },
       {
         path: "/database-table",
-        // element: <DatabaseTable />,
         element: (
           <PrivateRoute>
-            <DatabaseTable/>
+            <DatabaseTable />
           </PrivateRoute>
         ),
       },
@@ -108,12 +108,36 @@ const routes = createBrowserRouter([
         path: "/cancel",
         element: <Cancel />,
       },
+      {
+        path: "/settings",
+        element: (
+          <PrivateRoute>
+            <Setiings />
+          </PrivateRoute>
+        ),
+        children: [
+          {
+            path: "personal-information",  // Nested path under settings
+            element: (
+              <PrivateRoute>
+                <PersonalInformation />
+              </PrivateRoute>
+            ),
+          },
+          {
+            path: "payment-information",  // Nested path under settings
+            element: (
+              <PrivateRoute>
+                <PaymentInformation />
+              </PrivateRoute>
+            ),
+          },
+        ],
+      },
     ],
   },
-  //   {
-  //     path: "*",
-  //     element: <NotFound />,
-  //   },
 ]);
 
 export default routes;
+
+

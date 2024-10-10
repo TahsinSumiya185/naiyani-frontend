@@ -1,49 +1,44 @@
 import { useEffect, useState } from "react";
-
 import "./DatabaseTable.css";
 import { useNavigate } from "react-router-dom";
-
 import { CaretDownOutlined, CaretUpOutlined } from "@ant-design/icons";
-import { Dropdown, Menu } from "antd";
-
+import { Dropdown, Menu ,message} from "antd";
 import 'react-medium-image-zoom/dist/styles.css';
 import { useLocation } from "react-router-dom";
 import ItemsDetails from "./ItemsDetails";
-import { useFetchLeadsQuery, useRefreshDataMutation,useRefreshAsinQuery, useCheckAsinsMutation  } from "../../../redux/api/leadsApi/leadsApi";
+import { useFetchLeadsQuery, useRefreshAsinMutation, useRefreshDataMutation } from "../../../redux/api/leadsApi/leadsApi";
 import TopBar from "../../../components/topBar/TopBar";
 import Loading from "../../../components/loading/Loading";
 import Paginations from "../../../components/pagination/Paginations";
-
-
-
 
 const DatabaseTable = () => {
   const [sortingType, setSortingType] = useState('asc');
   const [columnName, setColumnName] = useState('estimated_sales_rank');
   const [limit, setLimit] = useState(4);
-  const [currentPage, setCurrentPage] = useState(() => {
-    return parseInt(localStorage.getItem('currentPage')) || 1;
-  });
+  const [currentPage, setCurrentPage] = useState(() => parseInt(localStorage.getItem('currentPage')) || 1);
   const [selectedAsin, setSelectedAsin] = useState(null);
   const [isPageLoading, setIsPageLoading] = useState(false);
+  const [refreshedAsins, setRefreshedAsins] = useState([]); 
+
 
   const location = useLocation();
   const query = new URLSearchParams(location.search);
   const categoryId = query.get('category_id') || 12;
-  const navigate = useNavigate();
+
 
   const offset = (currentPage - 1) * limit;
 
-  const { data, error, isLoading, refetch } = useFetchLeadsQuery({
+  const { data, error, isLoading,   refetch } = useFetchLeadsQuery({
     categoryId,
     columnName,
     sortingType,
     limit,
     offset,
+   
   });
 
   const [refreshData, { isLoading: isRefreshing }] = useRefreshDataMutation();
-
+  const [refreshAsin] = useRefreshAsinMutation();
   const items = [
     { key: 'amazon_fba_estimated_fees', label: 'Amazon FBA Est. fees' },
     { key: 'estimated_monthly_sales', label: 'Est. Monthly Sales' },
@@ -76,32 +71,36 @@ const DatabaseTable = () => {
     setLimit(pageSize);
   };
 
-  const handleRefresh = async () => {
-    if (!selectedAsin) return;
-    setIsPageLoading(true);
-    await refreshData({ asin: selectedAsin, categoryId });
-    await refetch(); 
-    setIsPageLoading(false);
-  };
+  //  const handleRefresh = async () => {
+  //   if (!selectedAsin) return;
+  //   setIsPageLoading(true);
+  //   await refreshData({ asin: selectedAsin, categoryId });
+  //   console.log(" patch asin",selectedAsin)
+  //   await refetch(); 
+  //   setIsPageLoading(false);
+  // };
   
+  
+  const handleRefresh = async (asin) => {
+  if (!asin) return;
+  setIsPageLoading(true);
+  setSelectedAsin(asin);  // Ensure the selected ASIN is set before calling the API
+  await refreshData({ asin, categoryId });
+  console.log("Refreshing ASIN:", asin);
+  await refetch(); 
+  setIsPageLoading(false);
+};
 
-  // useEffect(() => {
-  //   localStorage.setItem('currentPage', currentPage);
-  // }, [currentPage]);
-
+  
+  
   useEffect(() => {
     localStorage.setItem('currentPage', currentPage);
     refetch().finally(() => setIsPageLoading(false));
   }, [currentPage, limit, columnName, sortingType]);
-
-
-
+ 
   return (
-    <div className="">
-      <div>
-        <TopBar />
-      </div>
-
+    <div>
+      <TopBar />
       <div className="px-6 mt-[80px]">
         <div className="flex items-center justify-end mb-5 gap-2 pr-5 mt-32 lg:mt-0">
           <Dropdown overlay={menu} placement="bottomLeft">
@@ -112,24 +111,16 @@ const DatabaseTable = () => {
           </Dropdown>
 
           <button
-            className={`bg-white shadow-lg text-black p-2 rounded-lg border-none cursor-pointer ${
-              sortingType === "asc" ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "hover:bg-slate-200"
-            }`}
-            onClick={() => {
-              setSortingType("asc");
-            }}
+            className={`bg-white shadow-lg text-black p-2 rounded-lg border-none cursor-pointer ${sortingType === "asc" ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "hover:bg-slate-200"}`}
+            onClick={() => setSortingType("asc")}
             disabled={sortingType === "asc"}
           >
             <CaretUpOutlined style={{ fontSize: "25px" }} />
           </button>
 
           <button
-            className={`bg-white shadow-lg text-black p-2 rounded-lg border-none cursor-pointer ${
-              sortingType === "desc" ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "hover:bg-slate-200"
-            }`}
-            onClick={() => {
-              setSortingType("desc");
-            }}
+            className={`bg-white shadow-lg text-black p-2 rounded-lg border-none cursor-pointer ${sortingType === "desc" ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "hover:bg-slate-200"}`}
+            onClick={() => setSortingType("desc")}
             disabled={sortingType === "desc"}
           >
             <CaretDownOutlined style={{ fontSize: "25px" }} />
@@ -148,24 +139,25 @@ const DatabaseTable = () => {
           </div>
         ) : (
           <>
-          <div className="grid gap-8">
-            {data?.results?.data?.map((item) => (
-              <ItemsDetails key={item.asin} item={item} onClick={() => handleRefresh()} setSelectedAsin={setSelectedAsin} />
-            ))}
-          </div>
-           <div className="flex justify-center mt-4">
-           <Paginations
-             currentPage={currentPage}
-             limit={limit}
-             totalItems={data?.count || 0}
-             handlePageChange={handlePageChange}
-             handleLimitChange={handleLimitChange}
-           />
-         </div>
-         </>
+            <div className="grid gap-8">
+              
+     
+              {data?.results?.data?.map((item) => (
+                <ItemsDetails key={item.asin} item={item}   onClick={() => handleRefresh(item.asin)} setSelectedAsin={setSelectedAsin}  />
+              ))}
+            </div>
+            <div className="flex justify-center mt-4">
+              <Paginations
+                currentPage={currentPage}
+                limit={limit}
+                totalItems={data?.count || 0}
+                handlePageChange={handlePageChange}
+                handleLimitChange={handleLimitChange}
+              />
+            </div>
+          </>
         )}
 
-       
       </div>
     </div>
   );

@@ -4,12 +4,14 @@ import TopBar from "../../../components/topBar/TopBar";
 import CustomButton from "../../../components/customButton/CustomButton";
 import { useState } from "react";
 import { useUserRegisterMutation } from "../../../redux/api/auth/authApi";
-
+import { setUserInfo } from "../../../redux/api/auth/authSlice";
 import Loading from "../../../components/loading/Loading";
 import toast from "react-hot-toast";
 import { Input } from "antd";
 import PasswordChecklist from "react-password-checklist";
 import "./SignUp.css";
+import { useDispatch } from "react-redux";
+import { storeUserInfo } from "../../../services/auth.service";
 
 const SignUp = () => {
   const [firstName, setFirstName] = useState("");
@@ -23,7 +25,7 @@ const SignUp = () => {
   const [userRegister, { isLoading }] = useUserRegisterMutation();
 
   const navigate = useNavigate();
-
+  const dispatch = useDispatch();
   const handleInputChange = (type, event) => {
     const inputValue = event.target.value;
 
@@ -60,7 +62,7 @@ const SignUp = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     try {
       const payloadObj = {
         first_name: firstName,
@@ -69,19 +71,27 @@ const SignUp = () => {
         password: password,
         password2: confirmPassword,
       };
-
+  
       const res = await userRegister(payloadObj);
-
-      console.log("response", res);
-
+  
       if (res?.data) {
+        // Dispatch user info to Redux store
+        dispatch(setUserInfo({
+          firstName: res.data.first_name,
+          lastName: res.data.last_name,
+          email: res.data.email,
+        }));
+        storeUserInfo({
+          accessToken: res.data.access_token, // Make sure to include access_token if it's returned
+          firstName: res.data.first_name,
+          email: res.data.email,
+        });
         toast.success(res?.data?.message, {
           duration: 5000,
         });
-        console.log("res", res.data.message);
         navigate("/verify");
       }
-
+  
       if (res?.error) {
         toast.error("Please provide valid information");
       }

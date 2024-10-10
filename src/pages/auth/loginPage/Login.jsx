@@ -6,6 +6,8 @@ import menuIcon from "../../../assets/img/menu.png";
 import { useUserLoginMutation } from "../../../redux/api/auth/authApi";
 import { storeUserInfo } from "../../../services/auth.service";
 import Loading from "../../../components/loading/Loading";
+import { useDispatch } from "react-redux";
+import { setUserInfo } from "../../../redux/api/auth/authSlice";
 
 const items = [
   {
@@ -20,7 +22,7 @@ const items = [
     ),
   },
   {
-    key: "1",
+    key: "2",
     label: (
       <Link className="font-bold pr-10 text-[16px] hover:text-white" to="/help">
         Help
@@ -37,7 +39,7 @@ const Login = () => {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const [userLogin, { isLoading }] = useUserLoginMutation();
@@ -73,30 +75,36 @@ const Login = () => {
     }
   };
 
+
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
   
+    const payloadObj = { email, password };
     try {
-      const payloadObj = {
-        email: email,
-        password: password,
-      };
-  
       const res = await userLogin(payloadObj);
   
       if (res?.data?.data?.access_token) {
-        // Store the access token
-        storeUserInfo({ accessToken: res?.data?.data?.access_token });
-  
-        // Retrieve customer ID from the response
-        const customerId = res?.data?.data?.customer_id;
-  
-        // Get the last visited page from localStorage (if any) or default to home page
+        const userData = res.data.data;
+
+        // Store user info in local storage
+        storeUserInfo({
+          accessToken: userData.access_token,
+          firstName: userData.first_name,
+          email: userData.email,
+        });
+
+        // Dispatch user info to Redux store
+        dispatch(setUserInfo({
+          firstName: userData.first_name,
+          email: userData.email,
+          accessToken: userData.access_token,
+        }));
+
+        const customerId = userData.customer_id;
         const lastVisitedPage = localStorage.getItem('lastVisitedPage') || '/database-btn';
   
-        // Check if customer ID exists
         if (!customerId) {
-          // If customer ID is not found, redirect to pricing
           message.warning({
             content: "Customer ID not found, Please subscribe",
             key: "login-warning",
@@ -104,22 +112,16 @@ const Login = () => {
           });
           navigate("/pricing");
         } else {
-          // If customer ID is found, redirect to the last visited page or database button
           message.success({
             content: "Login Successful",
             key: "login-loading",
             duration: 3,
           });
           navigate(lastVisitedPage);
-  
-          // Clear the stored last visited page after successful login
           localStorage.removeItem('lastVisitedPage');
         }
-      }
-  
-      if (res?.error) {
-        // Show error message if login fails
-        message.error(res?.error?.data?.data?.detail);
+      } else if (res?.error) {
+        message.error(res.error.data.detail);
       }
   
       console.log("response", res);
@@ -127,6 +129,7 @@ const Login = () => {
       console.error(error);
     }
   };
+  
   
   if (isLoading) {
     return <Loading />;

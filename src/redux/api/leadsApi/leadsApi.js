@@ -57,6 +57,6 @@ export const leadsApi = baseApi.injectEndpoints({
 export const {
   useFetchLeadsQuery,
   useRefreshDataMutation,
-  useRefreshAsinQuery,
+  useRefreshAsinMutation,
   useCheckAsinsMutation,
 } = leadsApi;

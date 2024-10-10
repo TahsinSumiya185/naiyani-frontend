@@ -1,8 +1,10 @@
 import { jwtDecode } from "jwt-decode";
 import { getFromLocalStorage, setToLocalStorage } from "../utils/localStorage";
 
-export const storeUserInfo = ({ accessToken }) => {
-  return setToLocalStorage("accessToken", accessToken);
+export const storeUserInfo = ({ accessToken, firstName, email }) => {
+  setToLocalStorage("accessToken", accessToken);
+  setToLocalStorage("firstName", firstName);
+  setToLocalStorage("email", email);
 };
 
 export const getUserInfo = () => {
