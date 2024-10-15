@@ -1,12 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import "./DatabaseTable.css";
 import { useNavigate } from "react-router-dom";
 import { CaretDownOutlined, CaretUpOutlined } from "@ant-design/icons";
-import { Dropdown, Menu ,message} from "antd";
+import { Dropdown, Menu, message } from "antd";
 import 'react-medium-image-zoom/dist/styles.css';
 import { useLocation } from "react-router-dom";
 import ItemsDetails from "./ItemsDetails";
-import { useFetchLeadsQuery, useRefreshAsinMutation, useRefreshDataMutation } from "../../../redux/api/leadsApi/leadsApi";
+import { useFetchLeadsQuery, useRefreshAsinMutation, useRefreshDataMutation, useCheckAsinsMutation } from "../../../redux/api/leadsApi/leadsApi";
 import TopBar from "../../../components/topBar/TopBar";
 import Loading from "../../../components/loading/Loading";
 import Paginations from "../../../components/pagination/Paginations";
@@ -19,26 +19,25 @@ const DatabaseTable = () => {
   const [selectedAsin, setSelectedAsin] = useState(null);
   const [isPageLoading, setIsPageLoading] = useState(false);
   const [refreshedAsins, setRefreshedAsins] = useState([]); 
-
+  const [disabledAsins, setDisabledAsins] = useState([]); 
+  const [loadingAsins, setLoadingAsins] = useState({});
 
   const location = useLocation();
   const query = new URLSearchParams(location.search);
   const categoryId = query.get('category_id') || 12;
 
-
-  const offset = (currentPage - 1) * limit;
-
-  const { data, error, isLoading,   refetch } = useFetchLeadsQuery({
+  const { data, error, isLoading, refetch } = useFetchLeadsQuery({
     categoryId,
     columnName,
     sortingType,
     limit,
-    offset,
-   
+    offset: (currentPage - 1) * limit,
   });
 
   const [refreshData, { isLoading: isRefreshing }] = useRefreshDataMutation();
   const [refreshAsin] = useRefreshAsinMutation();
+  const [checkAsins] = useCheckAsinsMutation();
+
   const items = [
     { key: 'amazon_fba_estimated_fees', label: 'Amazon FBA Est. fees' },
     { key: 'estimated_monthly_sales', label: 'Est. Monthly Sales' },
@@ -71,33 +70,82 @@ const DatabaseTable = () => {
     setLimit(pageSize);
   };
 
-  //  const handleRefresh = async () => {
-  //   if (!selectedAsin) return;
-  //   setIsPageLoading(true);
-  //   await refreshData({ asin: selectedAsin, categoryId });
-  //   console.log(" patch asin",selectedAsin)
-  //   await refetch(); 
-  //   setIsPageLoading(false);
-  // };
+  const fetchRefreshedAsins = async () => {
+    if (!data?.results?.data) return;
+  
+    const currentAsins = data.results.data.map(item => item.asin); 
+    console.log("Current items per page:", currentAsins); 
+  
+    try {
+      const response = await checkAsins(currentAsins);
+      console.log("Check ASINs Response:", response); 
+  
+      if (response?.data?.data) {
+        const refreshedAsins = response.data.data; 
+        setRefreshedAsins(refreshedAsins);
+
+        setDisabledAsins(currentAsins.filter(asin => refreshedAsins.includes(asin)));
+  
+   
+        if (refreshedAsins.length === 0) {
+          console.log("No items on this page have been refreshed");
+        }
+      } else {
+    
+        console.log("No data returned from checkAsins, but no error occurred.");
+      }
+    } catch (error) {
+
+      if (error.response) {
+        console.error("Error fetching refreshed ASINs:", error);
+        message.error("Error fetching refreshed ASINs.");
+      } else {
+        console.log("Request completed but no ASINs were refreshed.");
+      }
+    }
+  };
   
   
   const handleRefresh = async (asin) => {
-  if (!asin) return;
-  setIsPageLoading(true);
-  setSelectedAsin(asin);  // Ensure the selected ASIN is set before calling the API
-  await refreshData({ asin, categoryId });
-  console.log("Refreshing ASIN:", asin);
-  await refetch(); 
-  setIsPageLoading(false);
-};
+    if (!asin) return;
+  
+    setLoadingAsins((prev) => ({ ...prev, [asin]: true })); // Set loading for the specific ASIN
+    setSelectedAsin(asin);
+    
+    try {
+      await refreshData({ asin, categoryId });
+      const refreshAsinResponse = await refreshAsin(asin);
+  
+      if (refreshAsinResponse?.data?.status_code === 201) {
+        message.success(refreshAsinResponse?.data?.message || "Product refreshed successfully");
+        setRefreshedAsins((prev) => Array.isArray(prev) ? [...prev, asin] : [asin]);
+      } else if (refreshAsinResponse?.data?.status_code === 200) {
+        message.warning(refreshAsinResponse?.data?.message || "Product can only be refreshed once per day");
+        setRefreshedAsins((prev) => Array.isArray(prev) ? [...prev, asin] : [asin]);
+      } else {
+        message.error(`Unexpected error refreshing ASIN ${asin}: ${refreshAsinResponse?.data?.message || 'No additional information available.'}`);
+      }
+    } catch (error) {
+      console.error("Failed to refresh ASIN:", error);
+      message.error(`Failed to refresh ASIN ${asin}.`);
+    } finally {
+      setLoadingAsins((prev) => ({ ...prev, [asin]: false })); // Reset loading for the specific ASIN
+    }
+  };
+  
+  
 
-  
-  
   useEffect(() => {
     localStorage.setItem('currentPage', currentPage);
     refetch().finally(() => setIsPageLoading(false));
-  }, [currentPage, limit, columnName, sortingType]);
- 
+  }, [currentPage, limit, columnName, sortingType, refetch]);
+
+  useEffect(() => {
+    if (data?.results?.data) {
+      fetchRefreshedAsins();
+    }
+  }, [data]);
+
   return (
     <div>
       <TopBar />
@@ -133,18 +181,30 @@ const DatabaseTable = () => {
           </div>
         </div>
 
-        {isLoading || isPageLoading || isRefreshing ? (
+        {isLoading || isPageLoading  ? (
           <div className="flex justify-center items-center h-64">
             <Loading size="large" />
           </div>
         ) : (
           <>
             <div className="grid gap-8">
-              
-     
-              {data?.results?.data?.map((item) => (
-                <ItemsDetails key={item.asin} item={item}   onClick={() => handleRefresh(item.asin)} setSelectedAsin={setSelectedAsin}  />
-              ))}
+          {data?.results?.data?.map((item) => (
+  <div key={item.asin} className="relative">
+    {loadingAsins[item.asin] && (
+      <div className="absolute inset-0 flex justify-center items-center bg-white bg-opacity-50">
+        <Loading size="small" /> {/* or however you want to display loading */}
+      </div>
+    )}
+    <ItemsDetails
+      item={item}
+      onClick={() => handleRefresh(item.asin)}
+      refreshedAsins={refreshedAsins}
+      isLoading={loadingAsins[item.asin]}
+      isDisabled={disabledAsins.includes(item.asin)}
+    />
+  </div>
+))}
+
             </div>
             <div className="flex justify-center mt-4">
               <Paginations
@@ -157,7 +217,6 @@ const DatabaseTable = () => {
             </div>
           </>
         )}
-
       </div>
     </div>
   );

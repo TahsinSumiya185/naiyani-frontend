@@ -209,7 +209,7 @@ const SignUp = () => {
           </div>
         </form>
       </div>
-
+      <div className="my-5 text-center" ><p className="text-gray-700 text-md text-xl">Already have an account?   <Link className="text-gray-900  hover:underline " to='/login'>Sign in Here!</Link></p></div>
       <div className="help-animation shadow-none text-center text-[16px] font-sans my-5">
         By clicking Submit, you are agreeing to Naiyani's{" "}
         <span>

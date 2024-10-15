@@ -18,9 +18,26 @@ export const getUserInfo = () => {
   }
 };
 
+// export const isLoggedIn = () => {
+//   const authToken = getFromLocalStorage("accessToken");
+//   return authToken;
+// };
+
+
 export const isLoggedIn = () => {
   const authToken = getFromLocalStorage("accessToken");
-  return authToken;
+
+  if (authToken) {
+    const decodedData = jwtDecode(authToken);
+    const currentTime = Date.now() / 1000; 
+    if (decodedData.exp < currentTime) {
+    
+      removeUserInfo("accessToken");
+      return false; 
+    }
+    return true; 
+  }
+  return false; 
 };
 
 export const removeUserInfo = (key) => {

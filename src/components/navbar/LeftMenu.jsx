@@ -9,12 +9,14 @@ const LeftMenu = ({ mode, isLoggedIn }) => {
     { key: "Contact us", label: "Contact us", link: "/contact-us" },
   ];
 
-  // Conditionally add items based on login status
+ 
   if (isLoggedIn) {
-    items.push(
-      { key: "Database", label: "Database", link: "/database-btn" },
-      { key: "Invoices", label: "Invoices", link: "/invoices" }
-    );
+    items.push({
+      key: "Database",
+      label: "Database",
+      link: "/database-btn",
+      isExternal: true, 
+    });
   }
 
   return (
@@ -25,16 +27,27 @@ const LeftMenu = ({ mode, isLoggedIn }) => {
     >
       {items.map((item) => (
         <div key={item.key}>
-          <NavLink
-            className={({ isActive }) =>
-              isActive
-                ? "underline hover:text-black"
-                : "no-underline hover:text-black"
-            }
-            to={item.link}
-          >
-            {item.label}
-          </NavLink>
+          {item.isExternal ? (
+            <a
+              href={item.link}
+              target="_blank"
+              rel="noopener noreferrer" 
+              className="no-underline hover:text-black"
+            >
+              {item.label}
+            </a>
+          ) : (
+            <NavLink
+              className={({ isActive }) =>
+                isActive
+                  ? "underline hover:text-black"
+                  : "no-underline hover:text-black"
+              }
+              to={item.link}
+            >
+              {item.label}
+            </NavLink>
+          )}
         </div>
       ))}
     </div>

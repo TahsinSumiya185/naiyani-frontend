@@ -6,21 +6,20 @@ import { NavLink, useNavigate } from "react-router-dom";
 import menuIcon from "../../assets/img/menu.png";
 import logo from "../../assets/img/naiyanLogo.jpg";
 import { isLoggedIn, removeUserInfo } from "../../services/auth.service";
-
+import { logout } from "../../redux/api/auth/authSlice";
+import { useDispatch } from "react-redux";
 const Navbar1 = () => {
   const [visible, setVisible] = useState(false);
   const navigate = useNavigate(); // Step 1: Get navigate function
-
+  const dispatch = useDispatch()
   const showDrawer = () => {
     setVisible(!visible);
   };
 
   const handleLogout = () => {
-    // Store the current path in localStorage
-    localStorage.setItem('lastVisitedPage', window.location.pathname);
-  
     removeUserInfo("accessToken");
-    navigate('/');
+    dispatch(logout()); 
+    navigate("/"); 
   };
   
   

@@ -12,8 +12,9 @@ import Navbar1 from "../../components/navbar/Navbar1";
 import ProductVideo from "../../components/landingPage/ProductVideo";
 import CategoriesVideo from "../../components/landingPage/CategoriesVideo";
 import FilteringVideo from "../../components/landingPage/FilteringVideo";
-
+import { useNavigate } from 'react-router-dom';
 const LandingPage = () => {
+  const navigate = useNavigate();
   return (
     <>
           <Navbar1 />
@@ -47,7 +48,8 @@ const LandingPage = () => {
           {/* button */}
 
           <div className="lg:flex lg:flex-row flex flex-col items-center my-5 lg:gap-10 gap-3">
-            <button
+            <button 
+              onClick={() => navigate('/pricing')}
               style={{
                 boxShadow: "1px 4px 2px rgba(26, 25, 25, 0.25)",
               }}
@@ -56,7 +58,7 @@ const LandingPage = () => {
               <span className="px-5">START A 7-DAY FREE TRIAL</span>{" "}
               <FaArrowAltCircleRight className="h-[18px] w-[18px]  " />
             </button>
-            <Link className="underline lg:text-lg text-[13px]">Learn more</Link>
+            <Link to='/about-us' className="underline lg:text-lg text-[13px]">Learn more</Link>
           </div>
         </div>
 

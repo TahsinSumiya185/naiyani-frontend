@@ -21,7 +21,8 @@ import PrivateRoute from "./PrivateRoute";
 import Setiings from "../pages/settings/Setiings";
 import PersonalInformation from "../pages/settings/personalInformation/PersonalInformation";
 import PaymentInformation from "../pages/settings/paymentInformation/paymentInformation";
-
+import SuscriptionInformation from "../pages/settings/subscribtion/SuscriptionInformation";
+import SubscribtionCancallation from "../pages/settings/subscribtion/SubscribtionCancallation";
 
 const routes = createBrowserRouter([
   {
@@ -98,15 +99,27 @@ const routes = createBrowserRouter([
       },
       {
         path: "/subscribe",
-        element: <Subscribe />,
+        element: (
+          <PrivateRoute>
+            <Subscribe />
+          </PrivateRoute>
+        ),
       },
       {
         path: "/account",
-        element: <Account />,
+        element: (
+          <PrivateRoute>
+            <Account />
+          </PrivateRoute>
+        ),
       },
       {
-        path: "/cancel",
-        element: <Cancel />,
+        path: "/subscription-cancel",
+        element: (
+          <PrivateRoute>
+            <SubscribtionCancallation />
+          </PrivateRoute>
+        ),
       },
       {
         path: "/settings",
@@ -117,7 +130,7 @@ const routes = createBrowserRouter([
         ),
         children: [
           {
-            path: "personal-information",  // Nested path under settings
+            path: "personal-information",
             element: (
               <PrivateRoute>
                 <PersonalInformation />
@@ -125,19 +138,26 @@ const routes = createBrowserRouter([
             ),
           },
           {
-            path: "payment-information",  // Nested path under settings
+            path: "payment-information",
             element: (
               <PrivateRoute>
                 <PaymentInformation />
               </PrivateRoute>
             ),
           },
+          {
+            path: "subscription-details",
+            element: (
+              <PrivateRoute>
+                <SuscriptionInformation />
+              </PrivateRoute>
+            ),
+          },
         ],
       },
+      
     ],
   },
 ]);
 
 export default routes;
-
-

@@ -1,12 +1,23 @@
 import { Link } from "react-router-dom";
-
 import Zoom from 'react-medium-image-zoom'
-import { Dropdown, Menu, Input } from "antd";
 import { IoMdRefreshCircle } from "react-icons/io";
-import { LinkOutlined, CaretDownOutlined, CaretUpOutlined } from "@ant-design/icons";
-const { Search } = Input;
-const ItemsDetails = ({item,onClick,setSelectedAsin}) => {
-    
+import { LinkOutlined} from "@ant-design/icons";
+import { useState } from "react";
+
+
+const ItemsDetails = ({item, onClick,refreshedAsins , isDisabled }) => {
+
+  const [showWarning, setShowWarning] = useState(false);
+
+  const handleClick = () => {
+    if (!isDisabled) {
+      onClick(item.asin); // Call onClick only if not refreshed
+    } else {
+      setShowWarning(true); // Show the warning if refreshed
+      setTimeout(() => setShowWarning(false), 5000); // Hide message after 5 seconds
+    }
+  };
+
   const textStyle = (value) => {
     if (value === 0) {
       return "text-black";
@@ -69,7 +80,9 @@ const ItemsDetails = ({item,onClick,setSelectedAsin}) => {
                   <div className="flex justify-between">
                     <div className="font-medium">Amazon FBA Est. fees:</div>
                     <div className="ml-2 text-red-500">
-                    {item.amazon_fba_estimated_fees}
+                    ${item.amazon_fba_estimated_fees 
+    ? parseFloat(item.amazon_fba_estimated_fees).toFixed(2) 
+    : 'N/A'}
                     </div>
                   </div>
                   <div className="flex justify-between">
@@ -98,7 +111,10 @@ const ItemsDetails = ({item,onClick,setSelectedAsin}) => {
                       className={textStyle(Number(item.estimated_gross_profit))}
 
                     >
-                         {item.estimated_gross_profit}
+                      ${item.estimated_gross_profit 
+    ? parseFloat(item.estimated_gross_profit).toFixed(2) 
+    : 'N/A'}
+                        
                       {/* $ {Number(item["Estimated Gross Profit $"]).toFixed(2)} */}33
                     </div>
                   </div>
@@ -122,7 +138,11 @@ const ItemsDetails = ({item,onClick,setSelectedAsin}) => {
                     className={textStyle(Number(item.estimated_net_profit))}
                     >
                       {/* $ {Number(item["Estimated Net Profit $"]).toFixed(2)} */}
-                      {item.estimated_net_profit}
+                      ${item.estimated_net_profit
+    ? parseFloat(item.estimated_net_profit).toFixed(2) 
+    : 'N/A'}
+                
+                    
                     </div>
                   </div>
                   <div className="flex justify-between">
@@ -195,14 +215,19 @@ const ItemsDetails = ({item,onClick,setSelectedAsin}) => {
                     </Link>{" "}
                   </div>
                 </div>
-
-                <div className="">
-                  <IoMdRefreshCircle   onClick={() => { 
-      setSelectedAsin(item.asin);  // Set selected ASIN
-      onClick();  // Trigger refresh
-    }} className="w-10 h-10 text-gray-400 hover:animate-spin hover:cursor-pointer"/>
-                
-                </div>
+                <div className="relative">
+                <IoMdRefreshCircle
+        onClick={handleClick}
+        className={`w-10 h-10 text-gray-400 ${
+          isDisabled
+            ? "cursor-not-allowed text-gray-100"
+            : "hover:animate-spin hover:text-gray-600 cursor-pointer"
+        }`}
+        title={isDisabled ? "Product can only be refreshed once per day" : "Refresh this ASIN"}
+      />
+   
+      {/* Render other item details */}
+    </div>
               </div>
             </div>
     </>

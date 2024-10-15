@@ -1,0 +1,15 @@
+.custom-checkbox {
+    width: 24px; 
+    height: 24px; 
+    border-radius: 50%; 
+    border: 2px solid rgb(80, 79, 79); 
+    background-color: white; 
+    appearance: none;
+    cursor: pointer; 
+  }
+  
+  .custom-checkbox:checked {
+    background-color: gray; 
+    border: 2px solid gray; 
+  }
+  

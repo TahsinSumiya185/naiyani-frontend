@@ -4,9 +4,7 @@ import { useState } from "react";
 const PaymentInformation = () => {
     const [postalCode, setPostalCode] = useState('');
     const [postalCodeError, setPostalCodeError] = useState('');
-    const handleMenuClick = (e) => {
-        setSelectedItem(e.key);
-      };
+
       const handlePostalCodeChange = (e) => {
         const input = e.target.value.toUpperCase();
         const lastChar = input.slice(-1);
@@ -30,34 +28,25 @@ const PaymentInformation = () => {
     <div className="lg:px-32 px-8 font-sans">
 <form  className='w-full max-w-7xl mx-auto mt-32 p-6'>
 
-<div className="grid md:grid-cols-2 md:gap-6">
+
  <div className="gradient-button z-0 w-full mb-5 group">
  <input
        type="text"
-       placeholder="First Name"
+       placeholder="Cardholder's name"
        // value={cardHolderName}
        // onChange={(e) => setCardHolderName(e.target.value)}
        className="w-full h-full expanding-input"
        required
      />
  </div>
- <div className="gradient-button z-0 w-full mb-5 group">
- <input
-       type="text"
-       placeholder="Last Name"
-       // value={cardHolderName}
-       // onChange={(e) => setCardHolderName(e.target.value)}
-       className="w-full h-full expanding-input"
-       required
-     />
- </div>
-</div>
+
+
 
 
  <div className="gradient-button z-0 w-full mb-5 group">
  <input
        type="text"
-       placeholder="Address"
+       placeholder="Card number"
        // value={cardHolderName}
        // onChange={(e) => setCardHolderName(e.target.value)}
        className="w-full h-full expanding-input"
@@ -70,7 +59,7 @@ const PaymentInformation = () => {
  <div className="gradient-button z-0 w-full mb-5 group">
  <input
        type="text"
-       placeholder="City"
+       placeholder="Date of expiry"
        // value={cardHolderName}
        // onChange={(e) => setCardHolderName(e.target.value)}
        className="w-full h-full expanding-input"

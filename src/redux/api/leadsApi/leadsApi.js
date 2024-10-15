@@ -41,10 +41,10 @@ export const leadsApi = baseApi.injectEndpoints({
 
     // API for checking a list of ASINs
     checkAsins: builder.mutation({
-      query: (asins) => ({
+      query: (asin_list) => ({
         url: 'spapi/check-asins/',
         method: 'POST',
-        body: { asins },
+        body: { asin_list },
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },

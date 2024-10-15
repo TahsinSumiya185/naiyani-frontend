@@ -9,16 +9,21 @@ import { Elements } from "@stripe/react-stripe-js";
 import { useGetConfigQuery } from "./redux/api/payment/paymentApi";
 import { loadStripe } from "@stripe/stripe-js";
 import Loading from "./components/loading/Loading";
-import { setUserInfo } from "./redux/api/auth/authSlice";
+import { logout, setUserInfo } from "./redux/api/auth/authSlice";
 import { getFromLocalStorage } from "./utils/localStorage";
+import { isLoggedIn } from "./services/auth.service";
 
 const RootComponent = () => {
   const [stripePromise, setStripePromise] = useState(null);
   const { data, error } = useGetConfigQuery(); 
-  const dispatch = useDispatch(); // Move useDispatch here
+  const dispatch = useDispatch(); 
+  useEffect(() => {
 
-  // Load user info from localStorage
-// Load user info from localStorage
+    if (!isLoggedIn()) {
+      dispatch(logout()); 
+    }
+  }, [dispatch]);
+
 useEffect(() => {
   const storedUserInfo = {
     firstName: getFromLocalStorage("firstName"),

@@ -21,14 +21,14 @@ const items = [
       </Link>
     ),
   },
-  {
-    key: "2",
-    label: (
-      <Link className="font-bold pr-10 text-[16px] hover:text-white" to="/help">
-        Help
-      </Link>
-    ),
-  },
+  // {
+  //   key: "2",
+  //   label: (
+  //     <Link className="font-bold pr-10 text-[16px] hover:text-white" to="/help">
+  //       Help
+  //     </Link>
+  //   ),
+  // },
 ];
 
 const Login = () => {
@@ -86,40 +86,33 @@ const Login = () => {
   
       if (res?.data?.data?.access_token) {
         const userData = res.data.data;
-
+  
         // Store user info in local storage
         storeUserInfo({
           accessToken: userData.access_token,
           firstName: userData.first_name,
           email: userData.email,
         });
-
+  
         // Dispatch user info to Redux store
         dispatch(setUserInfo({
           firstName: userData.first_name,
           email: userData.email,
           accessToken: userData.access_token,
         }));
-
-        const customerId = userData.customer_id;
-        const lastVisitedPage = localStorage.getItem('lastVisitedPage') || '/database-btn';
   
-        if (!customerId) {
-          message.warning({
-            content: "Customer ID not found, Please subscribe",
-            key: "login-warning",
-            duration: 5,
-          });
-          navigate("/pricing");
-        } else {
-          message.success({
-            content: "Login Successful",
-            key: "login-loading",
-            duration: 3,
-          });
-          navigate(lastVisitedPage);
-          localStorage.removeItem('lastVisitedPage');
-        }
+        message.success({
+          content: "Login Successful",
+          key: "login-loading",
+          duration: 3,
+        });
+  
+        // Navigate to the home page
+        navigate('/');
+  
+        // Open the database page in a new tab
+        window.open('/database-btn', '_blank');
+        
       } else if (res?.error) {
         message.error(res.error.data.detail);
       }
@@ -129,6 +122,9 @@ const Login = () => {
       console.error(error);
     }
   };
+  
+  
+  
   
   
   if (isLoading) {
@@ -218,9 +214,11 @@ const Login = () => {
               )}
             </div>
           </form>
+          <div className="my-10" ><p className="text-gray-700 text-md text-xl">Dont have an account?   <Link className="text-gray-900  hover:underline " to='/sign-up'>Register Here!</Link></p></div>
         </div>
+        
       )}
-
+             
       {fields && (
         <div className="filter-animation ">
           <Dropdown menu={{ items }} placement="bottomLeft" arrow>
