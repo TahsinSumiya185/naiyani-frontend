@@ -10,6 +10,7 @@ export const leadsApi = baseApi.injectEndpoints({
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
       }),
+      providesTags: ['Leads'],
     }),
 
     //  API for refreshing data
@@ -25,6 +26,7 @@ export const leadsApi = baseApi.injectEndpoints({
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
       }),
+      invalidatesTags: ['Leads'],
     }),
 
     // API for refreshing ASIN
@@ -37,6 +39,7 @@ export const leadsApi = baseApi.injectEndpoints({
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
       }),
+      invalidatesTags: ['Leads'],
     }),
 
     // API for checking a list of ASINs
@@ -50,6 +53,7 @@ export const leadsApi = baseApi.injectEndpoints({
         },
       }),
     }),
+    
   }),
 });
 

@@ -28,20 +28,9 @@
 }
 
 
-.custom-magnifier img {
-  width: 100%; /* Ensure the image fills the container */
-  height: 100%;
-}
 
-.custom-magnifier .magnifier-preview {
-  width: 60px; /* Control the size of the magnified image */
-  height: 60px;
-}
 
-.custom-magnifier .magnifier-full-size {
-  max-width: 60px; /* Limit the maximum size of the full-size image */
-  max-height: 60px;
-}
+
 
 @keyframes appearButtons {
   0% {
@@ -68,4 +57,26 @@
 
 .hover-effect:hover .icon-img {
   color: rgb(59 130 246);
+  
+}
+/* Default positioning: Beside (for larger screens) */
+.image-container {
+  position: relative;
+  z-index: 1;
+}
+
+/* For smaller screens, change the position of the enlarged image */
+@media (max-width: 600px) {
+  .ReactImageMagnify__large-image {
+    position: static; /* Remove absolute positioning */
+    display: block;
+    margin-top: 20px; /* Space between thumbnail and enlarged image */
+  }
+  
+  /* You can also add additional adjustments for layout */
+  .image-container {
+    display: flex;
+    flex-direction: column; /* Ensure the image appears below the thumbnail */
+    align-items: center;
+  }
 }

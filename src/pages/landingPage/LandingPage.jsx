@@ -23,7 +23,7 @@ const LandingPage = () => {
 
 
       {/* product DB div */}
-      <div className="lg:flex lg:flex-row ">
+      <div className="lg:flex lg:flex-row justify-between  ">
         <div className=" lg:mr-20 flex flex-col">
           {/* heading */}
           <h1
@@ -32,7 +32,8 @@ const LandingPage = () => {
             data-aos-delay="600"
             className="headerFont gradient-text text-lg  lg:text-[44px]  lg:leading-[7rem] leading-9 text-center lg:text-left aos-responsive"
           >
-            Product database for E-commerce sellers
+              <span>Product database for</span><span className="inline">&nbsp;</span> <br />
+              <span>E-commerce sellers</span>
           </h1>
 
           {/* for mobile view video. hide for large */}

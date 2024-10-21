@@ -121,7 +121,7 @@ const Subscribe = () => {
   return (
     <>
 <TopBar/>
-<div className="lg:px-32 px-8 font-sans">
+<div className="lg:px-32 px-8 font-sans my-16">
 <form onSubmit={handleSubmit} className='w-full max-w-7xl mx-auto my-10 p-6'>
     <div>
       <p className='text-fonts font-semibold'>Billing Information</p>
@@ -234,64 +234,65 @@ const Subscribe = () => {
 
 
 
-  <div className="grid md:grid-cols-4  md:gap-6">
-<div className="gradient-button col-span-2 z-0  w-full mb-5">
-  <CardNumberElement
-    options={{
-      style: {
-        base: {
-          textAlign: 'center',
-          '::placeholder': {
-            font: '1rem/3 sans-serif',
-            fontWeight: 'bold',
-            color: '#a1a1a1',
+  <div className="grid md:grid-cols-4 md:gap-6 gap-4"> {/* Add gap-4 for small screens */}
+  <div className="gradient-button col-span-2 z-0 w-full mb-5">
+    <CardNumberElement
+      options={{
+        style: {
+          base: {
             textAlign: 'center',
+            '::placeholder': {
+              font: '1rem/3 sans-serif',
+              fontWeight: 'bold',
+              color: '#a1a1a1',
+              textAlign: 'center',
+            },
           },
         },
-      },
-    }}
-    className="w-full bg-white expanding-input text-center placeholder-center"
-  />
+      }}
+      className="w-full bg-white expanding-input text-center placeholder-center"
+    />
+  </div>
+
+  <div className="gradient-button z-0 col-span-1 w-full mb-5">
+    <CardExpiryElement
+      options={{
+        style: {
+          base: {
+            textAlign: 'center',
+            '::placeholder': {
+              font: '1rem/3 sans-serif',
+              fontWeight: 'bold',
+              color: '#a1a1a1',
+              textAlign: 'center',
+            },
+          },
+        },
+      }}
+      className="w-full bg-white expanding-input text-center placeholder-center"
+    />
+  </div>
+
+  <div className="gradient-button z-0 w-full mb-5 sm:mt-4"> {/* Added sm:mt-4 for small screens */}
+    <CardCvcElement
+      options={{
+        style: {
+          base: {
+            textAlign: 'center',
+            '::placeholder': {
+              font: '1rem/3 sans-serif',
+              fontWeight: 'bold',
+              color: '#a1a1a1',
+              textAlign: 'center',
+            },
+          },
+        },
+      }}
+      className="w-full bg-white expanding-input"
+    />
+  </div>
 </div>
 
-<div className="gradient-button z-0 col-span-1  w-full mb-5">
-  <CardExpiryElement
-    options={{
-      style: {
-        base: {
-          textAlign: 'center',
-          '::placeholder': {
-            font: '1rem/3 sans-serif',
-            fontWeight: 'bold',
-            color: '#a1a1a1',
-            textAlign: 'center',
-          },
-        },
-      },
-    }}
-    className="w-full bg-white expanding-input text-center placeholder-center"
-  />
-</div>
-<div className="gradient-button z-0 w-full   mb-5">
-  <CardCvcElement
-    options={{
-      style: {
-        base: {
-          textAlign: 'center',
-          '::placeholder': {
-            font: '1rem/3 sans-serif',
-            fontWeight: 'bold',
-            color: '#a1a1a1',
-            textAlign: 'center',
-          },
-        },
-      },
-    }}
-    className="w-full bg-white expanding-input"
-  />
-</div>
-
-</div>
 
 </div>
   

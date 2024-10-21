@@ -10,6 +10,9 @@ import { useFetchLeadsQuery, useRefreshAsinMutation, useRefreshDataMutation, use
 import TopBar from "../../../components/topBar/TopBar";
 import Loading from "../../../components/loading/Loading";
 import Paginations from "../../../components/pagination/Paginations";
+import { isLoggedIn } from "../../../services/auth.service";
+import ConfirmModal from "../../../components/modal/ConfirmModal";
+import LeadLoading from "../../../components/leadlist-Loading/LeadLoading";
 
 const DatabaseTable = () => {
   const [sortingType, setSortingType] = useState('asc');
@@ -21,11 +24,11 @@ const DatabaseTable = () => {
   const [refreshedAsins, setRefreshedAsins] = useState([]); 
   const [disabledAsins, setDisabledAsins] = useState([]); 
   const [loadingAsins, setLoadingAsins] = useState({});
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const location = useLocation();
   const query = new URLSearchParams(location.search);
   const categoryId = query.get('category_id') || 12;
-
+  const navigate = useNavigate()
   const { data, error, isLoading, refetch } = useFetchLeadsQuery({
     categoryId,
     columnName,
@@ -59,15 +62,24 @@ const DatabaseTable = () => {
   );
 
   const handleLimitChange = (newLimit, newPage) => {
-    setIsPageLoading(true);
-    setLimit(newLimit);
-    setCurrentPage(newPage);
+    if (isLoggedIn()) {
+      setIsPageLoading(true);
+      setLimit(newLimit);
+      setCurrentPage(newPage);
+    } else {
+      setIsModalOpen(true); // Show modal if user is not logged in
+    }
   };
 
+
   const handlePageChange = (page, pageSize) => {
-    setIsPageLoading(true);
-    setCurrentPage(page);
-    setLimit(pageSize);
+    if (isLoggedIn()) {
+      setIsPageLoading(true);
+      setCurrentPage(page);
+      setLimit(pageSize);
+    } else {
+      setIsModalOpen(true); // Show modal if user is not logged in
+    }
   };
 
   const fetchRefreshedAsins = async () => {
@@ -81,7 +93,7 @@ const DatabaseTable = () => {
       console.log("Check ASINs Response:", response); 
   
       if (response?.data?.data) {
-        const refreshedAsins = response.data.data; 
+        const refreshedAsins = Array.isArray(response.data.data) ? response.data.data : [];
         setRefreshedAsins(refreshedAsins);
 
         setDisabledAsins(currentAsins.filter(asin => refreshedAsins.includes(asin)));
@@ -107,32 +119,59 @@ const DatabaseTable = () => {
   
   
   const handleRefresh = async (asin) => {
-    if (!asin) return;
+    if (isLoggedIn()) {
+      if (!asin) return;
   
-    setLoadingAsins((prev) => ({ ...prev, [asin]: true })); // Set loading for the specific ASIN
-    setSelectedAsin(asin);
+      setLoadingAsins((prev) => ({ ...prev, [asin]: true })); // Set loading for the specific ASIN
+      setSelectedAsin(asin);
+      
+      try {
+        await refreshData({ asin, categoryId });
+        const refreshAsinResponse = await refreshAsin(asin);
     
-    try {
-      await refreshData({ asin, categoryId });
-      const refreshAsinResponse = await refreshAsin(asin);
-  
-      if (refreshAsinResponse?.data?.status_code === 201) {
-        message.success(refreshAsinResponse?.data?.message || "Product refreshed successfully");
-        setRefreshedAsins((prev) => Array.isArray(prev) ? [...prev, asin] : [asin]);
-      } else if (refreshAsinResponse?.data?.status_code === 200) {
-        message.warning(refreshAsinResponse?.data?.message || "Product can only be refreshed once per day");
-        setRefreshedAsins((prev) => Array.isArray(prev) ? [...prev, asin] : [asin]);
-      } else {
-        message.error(`Unexpected error refreshing ASIN ${asin}: ${refreshAsinResponse?.data?.message || 'No additional information available.'}`);
+        if (refreshAsinResponse?.data?.status_code === 201) {
+          message.success(refreshAsinResponse?.data?.message || "Product refreshed successfully");
+          const refreshedAsinsFromLocalStorage = Array.isArray(JSON.parse(localStorage.getItem('refreshedAsins'))) 
+  ? JSON.parse(localStorage.getItem('refreshedAsins')) 
+  : [];
+
+          const updatedRefreshedAsins = [...refreshedAsinsFromLocalStorage, asin];
+          localStorage.setItem('refreshedAsins', JSON.stringify(updatedRefreshedAsins));
+          setRefreshedAsins(updatedRefreshedAsins);
+
+        } else if (refreshAsinResponse?.data?.status_code === 200) {
+          message.warning(refreshAsinResponse?.data?.message || "Product can only be refreshed once per day");
+          const refreshedAsinsFromLocalStorage = Array.isArray(JSON.parse(localStorage.getItem('refreshedAsins'))) 
+  ? JSON.parse(localStorage.getItem('refreshedAsins')) 
+  : [];
+
+        const updatedRefreshedAsins = [...refreshedAsinsFromLocalStorage, asin];
+        localStorage.setItem('refreshedAsins', JSON.stringify(updatedRefreshedAsins));
+        setRefreshedAsins(updatedRefreshedAsins);
+
+        } else {
+          message.error(`Unexpected error refreshing ASIN ${asin}: ${refreshAsinResponse?.data?.message || 'No additional information available.'}`);
+        }
+      } catch (error) {
+        console.error("Failed to refresh ASIN:", error);
+        message.error(`Failed to refresh ASIN ${asin}.`);
+      } finally {
+        setLoadingAsins((prev) => ({ ...prev, [asin]: false })); 
       }
-    } catch (error) {
-      console.error("Failed to refresh ASIN:", error);
-      message.error(`Failed to refresh ASIN ${asin}.`);
-    } finally {
-      setLoadingAsins((prev) => ({ ...prev, [asin]: false })); // Reset loading for the specific ASIN
+    } else {
+      setIsModalOpen(true); 
     }
+    
   };
-  
+  const handleModalConfirm = () => {
+    setIsModalOpen(false);
+    navigate("/login"); 
+   
+  };
+
+  const handleModalCancel = () => {
+    setIsModalOpen(false);
+  };
   
 
   useEffect(() => {
@@ -144,6 +183,10 @@ const DatabaseTable = () => {
     if (data?.results?.data) {
       fetchRefreshedAsins();
     }
+    const refreshedAsinsFromLocalStorage = Array.isArray(JSON.parse(localStorage.getItem('refreshedAsins'))) 
+    ? JSON.parse(localStorage.getItem('refreshedAsins')) 
+    : [];
+  setRefreshedAsins(refreshedAsinsFromLocalStorage);
   }, [data]);
 
   return (
@@ -188,20 +231,24 @@ const DatabaseTable = () => {
         ) : (
           <>
             <div className="grid gap-8">
-          {data?.results?.data?.map((item) => (
+            {data?.results?.data?.map((item) => (
   <div key={item.asin} className="relative">
     {loadingAsins[item.asin] && (
-      <div className="absolute inset-0 flex justify-center items-center bg-white bg-opacity-50">
-        <Loading size="small" /> {/* or however you want to display loading */}
+      <div className="absolute inset-0 flex justify-center items-center bg-transparent">
+        <LeadLoading size="small" />
       </div>
     )}
-    <ItemsDetails
-      item={item}
-      onClick={() => handleRefresh(item.asin)}
-      refreshedAsins={refreshedAsins}
-      isLoading={loadingAsins[item.asin]}
-      isDisabled={disabledAsins.includes(item.asin)}
-    />
+    <div
+      className={`transition-opacity duration-300 ${loadingAsins[item.asin] ? 'opacity-10' : 'opacity-100'}`}
+    >
+      <ItemsDetails
+        item={item}
+        onClick={() => handleRefresh(item.asin)}
+        refreshedAsins={refreshedAsins}
+        isLoading={loadingAsins[item.asin]}
+        isDisabled={disabledAsins.includes(item.asin)}
+      />
+    </div>
   </div>
 ))}
 
@@ -217,6 +264,13 @@ const DatabaseTable = () => {
             </div>
           </>
         )}
+          <ConfirmModal
+          isOpen={isModalOpen}
+          onConfirm={handleModalConfirm}
+          onCancel={handleModalCancel}
+          msg="You need to log in to continue."
+          btnMsg="Go to Login"
+        />
       </div>
     </div>
   );

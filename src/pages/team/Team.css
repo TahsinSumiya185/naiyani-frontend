@@ -1,0 +1,17 @@
+.heading-font{
+    font-family: "Safira March, sans-seri";
+    src: url("../../assets/fonts/SafiraMarch.otf");
+}
+
+.gradient-text {
+    animation: textFade 4s ease forwards !important;
+  }
+
+  @keyframes textFade {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+}

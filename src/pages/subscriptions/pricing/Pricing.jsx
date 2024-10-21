@@ -90,13 +90,13 @@ const Pricing = () => {
             className="w-[175px] rounded-[50px] mx-auto flex justify-center items-center"
           >
             <button
-              className={`border-none cursor-pointer rounded-[30px] text-sm py-2 px-5 ${showMonthly ? "bg-[#963939] font-semibold text-white" : "bg-white text-[#A1A1A1]"}`}
+              className={`border-none cursor-pointer rounded-[30px] text-sm py-2 px-5 ${showMonthly ? "bg-gray-500 font-semibold text-white" : "bg-white text-[#A1A1A1]"}`}
               onClick={handleMonthlyClick}
             >
               Monthly
             </button>
             <button
-              className={`border-none cursor-pointer rounded-[30px] text-sm py-2 px-5 ${showYearly ? "bg-[#963939] font-semibold text-white" : "bg-white text-[#A1A1A1]"}`}
+              className={`border-none cursor-pointer rounded-[30px] text-sm py-2 px-5 ${showYearly ? "bg-gray-500 font-semibold text-white" : "bg-white text-[#A1A1A1]"}`}
               onClick={handleYearlyClick}
             >
               Yearly

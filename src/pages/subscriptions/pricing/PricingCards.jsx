@@ -22,9 +22,9 @@ const PricingCards = ({ prices, showMonthly, showYearly, createSubscription, isL
           className="lg:w-[450px] h-[420px] rounded-[30px] bg-white flex flex-col gap-5 px-5"
         >
           <div className="flex flex-col text-center gap-1 mt-5">
-            <div className="text-[24px] text-[#A1A1A1] tracking-[.2rem]">
+            {/* <div className="text-[24px] text-[#A1A1A1] tracking-[.2rem]">
               {price.product}
-            </div>
+            </div> */}
             <div className="text-[28px] font-bold">
               ${price.unit_amount / 100}{showMonthly ? '/mo' : '/yr'}
             </div>
